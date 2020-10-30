@@ -8,7 +8,12 @@ import com.github.piotrostrow.eo.Main;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Config.GAME_PATH = arg[0];
+
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.resizable = false;
+		config.width = 1366;
+		config.height = 768;
+
 		new LwjglApplication(new Main(), config);
 	}
 }
