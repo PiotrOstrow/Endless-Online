@@ -9,7 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.assets.Assets;
+import com.github.piotrostrow.eo.screens.GameScreen;
 import com.github.piotrostrow.eo.shaders.GfxShader;
 import com.github.piotrostrow.eo.ui.actors.LoginWindow;
 import com.github.piotrostrow.eo.ui.actors.RegisterWindow;
@@ -47,15 +49,29 @@ public class MainMenuStage extends Stage {
 
 		table.pack();
 
-		exitButton.addListener(new ClickListener(){
+		ClickListener clickListener = new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				Gdx.app.exit();
+				if (event.getTarget() == playButton) {
+					loginWindow.setVisible(true);
+				} else if (event.getTarget() == exitButton) {
+					Gdx.app.exit();
+				}
 			}
-		});
+		};
+
+		createAccountButton.addListener(clickListener);
+		playButton.addListener(clickListener);
+		creditButton.addListener(clickListener);
+		exitButton.addListener(clickListener);
+
+		loginWindow = new LoginWindow();
+		loginWindow.setPosition(Gdx.graphics.getWidth() - loginWindow.getWidth() - 50, 50);
+		loginWindow.setVisible(false);
+		addActor(loginWindow);
 	}
 
-	private Button createButton(TextureRegion up, TextureRegion down){
+	private Button createButton(TextureRegion up, TextureRegion down) {
 		Button.ButtonStyle style = new Button.ButtonStyle();
 		style.up = new TextureRegionDrawable(up);
 		style.over = style.down = new TextureRegionDrawable(down);

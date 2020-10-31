@@ -8,6 +8,16 @@ import com.github.piotrostrow.eo.screens.MainMenuScreen;
 
 public class Main extends Game {
 
+	public static final Main instance;
+
+	static {
+		instance = new Main();
+	}
+
+	private Main(){
+
+	}
+
 	@Override
 	public void create () {
 		Assets.init();

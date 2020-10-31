@@ -20,7 +20,6 @@ import java.util.List;
 public class PEFile {
 
 	private final ByteBuffer byteBuffer;
-	private SeekableByteChannel byteChannel;
 
 	private Section resourceSection;
 
@@ -28,10 +27,11 @@ public class PEFile {
 
 	public PEFile(String path) throws IOException {
 		// read in the whole file
-		byteChannel = Files.newByteChannel(new File(path).toPath(), StandardOpenOption.READ);
+		SeekableByteChannel byteChannel = Files.newByteChannel(new File(path).toPath(), StandardOpenOption.READ);
 		byteBuffer = ByteBuffer.allocate((int) byteChannel.size());
 		byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
 		byteChannel.read(byteBuffer);
+		byteChannel.close();
 		byteBuffer.rewind();
 
 		// PE Header

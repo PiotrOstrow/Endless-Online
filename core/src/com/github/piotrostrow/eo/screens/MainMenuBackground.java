@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.github.piotrostrow.eo.assets.Assets;
-import com.github.piotrostrow.eo.map.emf.EmfMap;
 import com.github.piotrostrow.eo.map.emf.EmfMapRenderer;
 import com.github.piotrostrow.eo.shaders.BlurGfxShader;
 import com.github.piotrostrow.eo.shaders.GfxShader;
