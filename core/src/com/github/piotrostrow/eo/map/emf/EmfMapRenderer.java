@@ -3,10 +3,9 @@ package com.github.piotrostrow.eo.map.emf;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.graphics.g3d.Shader;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -37,10 +36,26 @@ public class EmfMapRenderer implements Disposable {
 
 	private int row1, row2, col1, col2;
 
-	public EmfMapRenderer(EmfMap map){
+	/**
+	 * Shader reference to dispose, can be null
+	 */
+	private ShaderProgram shader;
+
+	/**
+	 * Creates an instance where the shader is managed internally
+	 */
+	public EmfMapRenderer(EmfMap map) {
+		this(map, new GfxShader());
+		this.shader = this.batch.getShader();
+	}
+
+	/**
+	 * Creates an instance where the shader passed is managed by the user of this class
+	 */
+	public EmfMapRenderer(EmfMap map, ShaderProgram shader) {
 		this.map = map;
 		this.batch = new SpriteBatch();
-		this.batch.setShader(new GfxShader());
+		this.batch.setShader(shader);
 
 		float width = 1280;
 		float height = 720;
@@ -67,12 +82,105 @@ public class EmfMapRenderer implements Disposable {
 		prepareRender();
 		batch.begin();
 
-		renderLayer(map.getMapLayer(0));
+		renderLayer(map.groundLayer);
+		renderShadowLayer();
+
+		renderMiddleLayers();
+
+		renderLayer(map.ceilingLayer, 0, 64);
+		renderLayer(map.roofLayer, -132, 0);
 
 		batch.end();
 	}
 
-	private void renderLayer(MapLayer layer){
+	private void renderMiddleLayers() {
+		int entityCounter = 0;
+		int itemCounter = 0;
+		for (int col = col1; col <= col2; col++) {
+			for (int row = row2; row >= row1; row--) {
+				float x = (col * 32) + (row * 32);
+				float y = (row * 16) - (col * 16);
+
+				MapTile wallsSouthLayerTile = map.wallsSouthLayer.getTile(col, row);
+				if (wallsSouthLayerTile != null)
+					batch.draw(wallsSouthLayerTile.getTextureRegion(), x, y);
+
+				MapTile wallsEastLayertile = map.wallsEastLayer.getTile(col, row);
+				if (wallsEastLayertile != null)
+					batch.draw(wallsEastLayertile.getTextureRegion(), x + 32, y);
+
+				MapTile elevatedLayertile = map.elevatedLayer.getTile(col, row);
+				if (elevatedLayertile != null)
+					batch.draw(elevatedLayertile.getTextureRegion(), x, y + 32);
+
+				MapTile objectsLayerTile = map.objectsLayer.getTile(col, row);
+				if (objectsLayerTile != null) {
+					TextureRegion textureRegion = objectsLayerTile.getTextureRegion();
+					//check if null because of traps
+					if(textureRegion != null)
+						//dividing by integer on purpose, otherwise the object jitters left and right
+						batch.draw(textureRegion, x + (32f - textureRegion.getRegionWidth() / 2), y);
+				}
+
+				// another way of rendering items
+//				while (itemCounter < groundItems.size()){
+//					GroundItem item = groundItems.get(itemCounter);
+//					int px = item.position.x;
+//					int py = item.position.y;
+//					if(px == col && py == row) {
+//						Texture texture = item.getTexture();
+//						batch.draw(texture, x + ((64 - texture.getWidth()) / 2f), y - ((texture.getHeight() - 32) / 2f));
+//					} else if (px > col || (px == col && py < row)) {
+//						break;
+//					}
+//					itemCounter++;
+//				}
+
+//				while (entityCounter < entities.size()) {
+//					CharacterEntity entity = entities.get(entityCounter);
+//					GridPoint2 position = entity.getRenderingGridPosition();
+//					if (position.x == col && position.y == row) {
+//						entity.render(batch, x, y);
+//					} else if (position.x > col || (position.x == col && position.y < row)) {
+//						break;
+//					}
+//					entityCounter++;
+//				}
+
+
+				MapTile objectsOverlayLayerTile = map.objectsOverlayLayer.getTile(col, row);
+				if (objectsOverlayLayerTile != null) {
+					TextureRegion textureRegion = objectsOverlayLayerTile.getTextureRegion();
+					batch.draw(textureRegion, x + (32 - textureRegion.getRegionWidth() / 2f), y);
+				}
+			}
+		}
+	}
+
+	private void renderShadowLayer() {
+		batch.setColor(1, 1, 1, 0.5f);
+
+		for (int row = row2; row >= row1; row--) {
+			for (int col = col1; col <= col2; col++) {
+				float x = (col * 32) + (row * 32);
+				float y = (row * 16) - (col * 16);
+
+				MapTile tile = map.shadowLayer.getTile(col, row);
+				if (tile == null) continue;
+				TextureRegion region = tile.getTextureRegion();
+
+				x = x - 24 + ((64f - region.getRegionWidth()) / 2);
+				y = y + 12 - ((region.getRegionHeight() - 32));
+
+				x -= 32 - (region.getRegionWidth() / 2);
+
+				batch.draw(region, x, y);
+			}
+		}
+		batch.setColor(1, 1, 1, 1);
+	}
+
+	private void renderLayer(MapLayer layer) {
 		renderLayer(layer, 0, 0);
 	}
 
@@ -91,7 +199,7 @@ public class EmfMapRenderer implements Disposable {
 					continue;
 
 				TextureRegion textureRegion = tile.getTextureRegion();
-				if(textureRegion != null)
+				if (textureRegion != null)
 					batch.draw(textureRegion, x + xOffset, y + yOffset);
 			}
 		}
@@ -140,5 +248,7 @@ public class EmfMapRenderer implements Disposable {
 	@Override
 	public void dispose() {
 		batch.dispose();
+		if(shader != null)
+			shader.dispose();
 	}
 }

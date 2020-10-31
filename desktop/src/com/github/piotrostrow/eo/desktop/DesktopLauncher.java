@@ -10,9 +10,11 @@ public class DesktopLauncher {
 		Config.GAME_PATH = arg[0];
 
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.vSyncEnabled = false;
+		config.foregroundFPS = 240;
 		config.resizable = false;
-		config.width = 1366;
-		config.height = 768;
+		config.width = 1280;
+		config.height = 720;
 
 		new LwjglApplication(new Main(), config);
 	}

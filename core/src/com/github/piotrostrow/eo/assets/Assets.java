@@ -46,6 +46,7 @@ public class Assets {
 
 				for(ResourceDataEntry entry : bitmapDataEntries) {
 					Texture texture = peFile.loadTexture(entry);
+					texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 					gfx.put((i + 1) << 16 | entry.getID(), texture);
 				}
 			}

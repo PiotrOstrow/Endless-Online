@@ -20,7 +20,15 @@ public class EmfMap {
 	private final int relogX;
 	private final int relogY;
 
-	private final MapLayer[] layers = new MapLayer[9];
+	public final MapLayer groundLayer;
+	public final MapLayer shadowLayer;
+	public final MapLayer wallsSouthLayer;
+	public final MapLayer wallsEastLayer;
+	public final MapLayer objectsOverlayLayer;
+	public final MapLayer objectsLayer;
+	public final MapLayer elevatedLayer;
+	public final MapLayer ceilingLayer;
+	public final MapLayer roofLayer;
 
 	private final ArrayList<MapChest> mapChests;
 	private final TileSpecs tileSpecs;
@@ -88,12 +96,22 @@ public class EmfMap {
 		}
 
 
+		MapLayer[] layers = new MapLayer[9];
 		for (int i = 0; i < layers.length; i++) {
 			if(stream.available() > 0) {
 				layers[i] = new MapLayer(stream, width, height, fillTile, i);
 			}
 		}
 
+		this.groundLayer = layers[0];
+		this.objectsLayer = layers[1];
+		this.objectsOverlayLayer = layers[2];
+		this.wallsSouthLayer = layers[3];
+		this.wallsEastLayer = layers[4];
+		this.ceilingLayer = layers[5];
+		this.elevatedLayer = layers[6];
+		this.shadowLayer = layers[7];
+		this.roofLayer = layers[8];
 
 		if (stream.available() > 0){
 			int signs = stream.readUnsignedByte();
@@ -121,9 +139,5 @@ public class EmfMap {
 
 	public int getHeight() {
 		return height;
-	}
-
-	public MapLayer getMapLayer(int index){
-		return layers[index];
 	}
 }

@@ -8,17 +8,10 @@ import java.io.IOException;
 
 public class MapLayer {
 
-	// short cus number of different tiles will never exceed 2^15
-	public final short[][] gfx;
-
 	private final MapTile[][] tiles;
 
-//	private final ArrayList<EmfAnimatedTile> animatedTiles = new ArrayList<EmfAnimatedTile>();
-
-//	private boolean visible = true;
-
 	MapLayer(EmfFileInputStream stream, int width, int height, int fill, int layerIndex) throws IOException {
-		gfx = new short[height][width];
+		short[][] gfx = new short[height][width];
 		tiles = new MapTile[width][height];
 
 		if(layerIndex == 0)
