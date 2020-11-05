@@ -4,11 +4,14 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.github.piotrostrow.eo.assets.Assets;
+import com.github.piotrostrow.eo.net.Client;
 import com.github.piotrostrow.eo.screens.MainMenuScreen;
 
 public class Main extends Game {
 
 	public static final Main instance;
+
+	public static final Client client = new Client();
 
 	static {
 		instance = new Main();

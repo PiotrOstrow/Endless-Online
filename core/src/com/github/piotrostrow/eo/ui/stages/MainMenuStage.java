@@ -3,6 +3,7 @@ package com.github.piotrostrow.eo.ui.stages;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -11,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.assets.Assets;
-import com.github.piotrostrow.eo.screens.GameScreen;
 import com.github.piotrostrow.eo.shaders.GfxShader;
 import com.github.piotrostrow.eo.ui.actors.LoginWindow;
 import com.github.piotrostrow.eo.ui.actors.RegisterWindow;
@@ -20,8 +20,10 @@ public class MainMenuStage extends Stage {
 
 	public final Button createAccountButton, playButton, creditButton, exitButton;
 
-	private RegisterWindow registerPanel;
+	private RegisterWindow registerWindow;
 	private LoginWindow loginWindow;
+
+	private Actor toOpenOnConnect;
 
 	public MainMenuStage() {
 		super(new ScreenViewport());
@@ -52,8 +54,24 @@ public class MainMenuStage extends Stage {
 		ClickListener clickListener = new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				if (event.getTarget() == playButton) {
-					loginWindow.setVisible(true);
+				if(event.getTarget() == createAccountButton) {
+					if(!Main.client.isConnected()) {
+						Main.client.connect();
+						toOpenOnConnect = registerWindow;
+					}else{
+						registerWindow.setVisible(true);
+						loginWindow.setVisible(false);
+					}
+				} else if (event.getTarget() == playButton) {
+					if(!Main.client.isConnected()) {
+						Main.client.connect();
+						toOpenOnConnect = loginWindow;
+					}else{
+						loginWindow.setVisible(true);
+						registerWindow.setVisible(false);
+					}
+				} else if (event.getTarget() == creditButton) {
+					//TODO:
 				} else if (event.getTarget() == exitButton) {
 					Gdx.app.exit();
 				}
@@ -69,6 +87,19 @@ public class MainMenuStage extends Stage {
 		loginWindow.setPosition(Gdx.graphics.getWidth() - loginWindow.getWidth() - 50, 50);
 		loginWindow.setVisible(false);
 		addActor(loginWindow);
+
+		registerWindow = new RegisterWindow();
+	}
+
+	public void connected() {
+		if(toOpenOnConnect != null)
+			toOpenOnConnect.setVisible(true);
+		toOpenOnConnect = null;
+	}
+
+	public void disconnected() {
+		loginWindow.setVisible(false);
+		registerWindow.setVisible(false);
 	}
 
 	private Button createButton(TextureRegion up, TextureRegion down) {

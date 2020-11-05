@@ -4,26 +4,12 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static com.github.piotrostrow.eo.util.NumberEncoder.*;
+
 public class EmfFileInputStream extends FilterInputStream {
 
 	public EmfFileInputStream(InputStream stream) {
 		super(stream);
-	}
-
-	int decodeNumber(int a, int b, int c, int d) {
-		if (a == 254) a = 1;
-		if (b == 254) b = 1;
-		if (c == 254) c = 1;
-		if (d == 254) d = 1;
-		--a;
-		--b;
-		--c;
-		--d;
-
-		return (d * 253 * 253 * 253)
-				+ (c * 253 * 253)
-				+ (b * 253)
-				+ a;
 	}
 
 	public int readUnsignedByte() throws IOException {

@@ -1,4 +1,6 @@
 package com.github.piotrostrow.eo.ui.actors;
 
-public class RegisterWindow {
+import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
+
+public class RegisterWindow extends WidgetGroup {
 }
