@@ -135,6 +135,7 @@ public class Client {
 			bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
+			isConnecting = false;
 			return;
 		}
 

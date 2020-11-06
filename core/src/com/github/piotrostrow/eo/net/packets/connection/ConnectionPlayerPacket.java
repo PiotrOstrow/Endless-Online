@@ -2,6 +2,9 @@ package com.github.piotrostrow.eo.net.packets.connection;
 
 import com.github.piotrostrow.eo.net.Packet;
 
+/**
+ * Server to client ping player, updating the sequence numbers
+ */
 public class ConnectionPlayerPacket extends Packet {
 
 	public ConnectionPlayerPacket(byte[] buffer) {

@@ -39,6 +39,12 @@ public class Packet {
 		buffer.position(buffer.position() + n);
 	}
 
+	public String readFixedString(int length) {
+		String string = new String(buffer.array(), buffer.position(), length, StandardCharsets.US_ASCII);
+		buffer.position(buffer.position() + length);
+		return string;
+	}
+
 	public String readBreakString() {
 		int startPosition = buffer.position();
 		int endPosition = startPosition + 1;
@@ -50,7 +56,7 @@ public class Packet {
 		return new String(buffer.array(), startPosition, length, StandardCharsets.US_ASCII);
 	}
 
-	public int readByte() {
+	public int readUnencodedByte() {
 		return buffer.get() & 0xFF;
 	}
 
@@ -72,6 +78,10 @@ public class Packet {
 
 	public int readEncodedInt() {
 		return decodeNumber(buffer.get(), buffer.get(), buffer.get(), buffer.get());
+	}
+
+	public int readEncodedInt(int position) {
+		return decodeNumber(buffer.get(position), buffer.get(position + 1), buffer.get(position + 2), buffer.get(position + 3));
 	}
 
 	protected void writeEncodedShort(int value) {

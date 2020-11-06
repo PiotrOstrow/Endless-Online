@@ -2,7 +2,10 @@ package com.github.piotrostrow.eo.net;
 
 import com.github.piotrostrow.eo.net.packets.connection.ConnectionPlayerPacket;
 import com.github.piotrostrow.eo.net.packets.login.LoginReplyPacket;
-import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket;
+import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket1;
+import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket2;
+
+import static com.github.piotrostrow.eo.util.NumberEncoder.decodeNumber;
 
 public class PacketFactory {
 
@@ -20,8 +23,13 @@ public class PacketFactory {
 		if(action == PacketAction.PACKET_PLAYER && family == PacketFamily.PACKET_CONNECTION)
 			return new ConnectionPlayerPacket(buffer);
 
-		if(family == PacketFamily.PACKET_WELCOME && action == PacketAction.PACKET_REPLY)
-			return new WelcomeReplyPacket(buffer);
+		if(family == PacketFamily.PACKET_WELCOME && action == PacketAction.PACKET_REPLY) {
+			int subID = decodeNumber(buffer[2], buffer[3], 254, 254) & 0xFFFF;
+			if(subID == 1)
+				return new WelcomeReplyPacket1(buffer);
+			else if(subID == 2)
+				return new WelcomeReplyPacket2(buffer);
+		}
 
 		return new Packet(buffer);
 	}

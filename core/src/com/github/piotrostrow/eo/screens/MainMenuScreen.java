@@ -9,6 +9,9 @@ import com.github.piotrostrow.eo.net.ConnectionListener;
 import com.github.piotrostrow.eo.net.PacketAction;
 import com.github.piotrostrow.eo.net.PacketFamily;
 import com.github.piotrostrow.eo.net.constants.LoginReply;
+import com.github.piotrostrow.eo.net.packets.login.WelcomeMsgPacket;
+import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket1;
+import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket2;
 import com.github.piotrostrow.eo.ui.stages.CharacterSelectStage;
 import com.github.piotrostrow.eo.ui.stages.MainMenuStage;
 import com.github.piotrostrow.eo.net.packets.login.LoginReplyPacket;
@@ -21,6 +24,8 @@ public class MainMenuScreen implements Screen, ConnectionListener {
 	private final CharacterSelectStage characterSelectStage;
 
 	private final MainMenuBackground background;
+
+	private WelcomeReplyPacket1 welcomeReplyPacket1;
 
 	public MainMenuScreen() {
 		background = new MainMenuBackground();
@@ -56,7 +61,14 @@ public class MainMenuScreen implements Screen, ConnectionListener {
 					break;
 			}
 		} else if (packet.equals(PacketFamily.PACKET_WELCOME, PacketAction.PACKET_REPLY)) {
-
+			if(packet instanceof WelcomeReplyPacket1){
+				welcomeReplyPacket1 = (WelcomeReplyPacket1) packet;
+				Main.client.sendEncodedPacket(new WelcomeMsgPacket(welcomeReplyPacket1.getCharacterID()));
+			}else if(packet instanceof WelcomeReplyPacket2){
+				final WelcomeReplyPacket2 welcomeReplyPacket2 = (WelcomeReplyPacket2) packet;
+				// GameScreen constructor need openGL context
+				Gdx.app.postRunnable(() -> Main.instance.setScreen(new GameScreen(welcomeReplyPacket1, welcomeReplyPacket2)));
+			}
 		}
 	}
 

@@ -62,7 +62,7 @@ public class MainMenuStage extends Stage {
 						registerWindow.setVisible(true);
 						loginWindow.setVisible(false);
 					}
-				} else if (event.getTarget() == playButton) {
+			} else if (event.getTarget() == playButton) {
 					if(!Main.client.isConnected()) {
 						Main.client.connect();
 						toOpenOnConnect = loginWindow;

@@ -5,12 +5,13 @@ import com.github.piotrostrow.eo.net.Packet;
 /**
  * Reply packet to {@link WelcomeRequestPacket}
  */
-public class WelcomeReplyPacket extends Packet {
-	public WelcomeReplyPacket(byte[] buffer) {
+public class WelcomeReplyPacket1 extends Packet {
+
+	public WelcomeReplyPacket1(byte[] buffer) {
 		super(buffer);
 
-		// index 2, hardcoded value of 1
-		int reply = readEncodedShort();
+		// index 2
+		int subID = readEncodedShort();
 
 		// index 4, player ID not same as characterID cus 2 bytes
 		int playerID = readEncodedShort();
@@ -23,7 +24,13 @@ public class WelcomeReplyPacket extends Packet {
 
 		// index 12, 13, something with PK
 		skip(2);
+	}
 
+	public int getMapID() {
+		return readEncodedShort(10);
+	}
 
+	public int getCharacterID() {
+		return readEncodedInt(6);
 	}
 }
