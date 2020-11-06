@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
+import com.github.piotrostrow.eo.net.packets.login.LoginReplyPacket;
 
 public class CharacterPanel extends WidgetGroup {
 
@@ -12,25 +13,35 @@ public class CharacterPanel extends WidgetGroup {
 	public Button deleteButton;
 	public Label nameLabel;
 
-	private String name;
+	private LoginReplyPacket.Character characterData;
 
-	public void reset(){
+	public void reset() {
 		characterImage.setDrawable(null);
-		setName("");
+		setNameLabel("");
+		characterData = null;
 	}
 
-	public void setName(String name){
-		this.name = name;
-		if(name.length() > 14){
+	public void setCharacter(LoginReplyPacket.Character characterData) {
+		this.characterData = characterData;
+		setNameLabel(characterData.name);
+	}
+
+	private void setNameLabel(String name) {
+		if (name.length() > 14) {
 			String f = name.substring(0, 12) + "...";
 			nameLabel.setText(f);
-		}else{
+		} else {
 			nameLabel.setText(name);
 		}
 	}
 
-	@Override
-	public String getName() {
-		return name;
+	public boolean hasCharacter() {
+		return characterData != null;
+	}
+
+	public int getCharacterID() {
+		if(characterData == null)
+			return 0;
+		return characterData.id;
 	}
 }

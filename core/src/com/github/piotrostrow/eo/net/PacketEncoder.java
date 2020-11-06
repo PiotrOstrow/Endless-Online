@@ -101,7 +101,7 @@ public class PacketEncoder {
 	}
 
 	public void setInitialSequenceNumber(int sequence1, int sequence2) {
-		this.initialSequence = (sequence1 & 0xFFFF) * 7 - 11 + (sequence2 & 0xFFFF) - 2;
+		this.initialSequence = (sequence1 & 0xFF) * 7 - 11 + (sequence2 & 0xFF) - 2;
 	}
 
 	public void updateSequenceNumber(int sequence1, int sequence2) {

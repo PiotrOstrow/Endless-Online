@@ -1,5 +1,6 @@
 package com.github.piotrostrow.eo.net;
 
+import com.github.piotrostrow.eo.net.packets.connection.ConnectionAcceptPacket;
 import com.github.piotrostrow.eo.net.packets.connection.ConnectionPlayerPacket;
 import com.github.piotrostrow.eo.net.packets.init.*;
 
@@ -45,11 +46,11 @@ public class Client {
 		if(isConnected() && socket != null) {
 			try {
 				socket.close();
-				packetEncoder = new PacketEncoder();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}finally {
 				isConnected = false;
+				packetEncoder = new PacketEncoder();
 				if(connectionListener != null)
 					connectionListener.onDisconnect();
 			}
@@ -91,12 +92,8 @@ public class Client {
 	private void handleInitResponsePacket(InitResponsePacket packet){
 		if(packet.getPacketActionByte() != PacketAction.PACKET_A_INIT || packet.getPacketFamilyByte() != PacketFamily.PACKET_F_INIT) {
 			throw new RuntimeException("Received packet other than InitResponsePacket before packet encoder was initialized. " +
-					" Packet action: " + packet.getPacketAction() + ", packet family: " + packet.getPacketFamily());
+					" Packet action: " + packet.getPacketActionName() + ", packet family: " + packet.getPacketFamilyName());
 		}
-
-		System.err.println("Received unencoded packet: ");
-		System.err.println("\tPacket action: " + packet.getPacketAction() + " " + packet.getPacketActionName());
-		System.err.println("\tPacket family: " + packet.getPacketFamily() + " " + packet.getPacketFamilyName());
 
 		packetEncoder.setInitialSequenceNumber(packet.getSeqBytes1(), packet.getSeqBytes2());
 		packetEncoder.setEncodeMultiples(packet.getSendMultiplier(), packet.getReceiveMultiplier());
@@ -112,7 +109,7 @@ public class Client {
 	}
 
 	private boolean shouldHandle(Packet packet) {
-		if(packet.getPacketActionByte() == PacketAction.PACKET_PLAYER && packet.getPacketFamilyByte() == PacketFamily.PACKET_CONNECTION)
+		if(packet.equals(PacketFamily.PACKET_CONNECTION, PacketAction.PACKET_PLAYER))
 			return true;
 
 		return false;
@@ -132,8 +129,8 @@ public class Client {
 	private void networkLoop() {
 		try {
 			socket = new Socket();
-			socket.connect(new InetSocketAddress("localhost", 8078));
-//			socket.connect(new InetSocketAddress("localhost", 8077));
+//			socket.connect(new InetSocketAddress("localhost", 8078));
+			socket.connect(new InetSocketAddress("localhost", 8077));
 
 			bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
 		} catch (IOException e) {
@@ -162,10 +159,6 @@ public class Client {
 				} else {
 					byte[] output = packetEncoder.decode(buffer, size);
 					Packet packet = PacketFactory.serverToClient(output);
-
-					System.err.println("Received encoded packet: ");
-					System.err.println("\tPacket action: " + packet.getPacketAction() + " " + packet.getPacketActionName());
-					System.err.println("\tPacket family: " + packet.getPacketFamily() + " " + packet.getPacketFamilyName());
 
 					if(shouldHandle(packet))
 						handle(packet);

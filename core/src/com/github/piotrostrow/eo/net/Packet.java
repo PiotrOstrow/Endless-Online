@@ -12,17 +12,20 @@ public class Packet {
 	protected final ByteBuffer buffer;
 
 	/**
-	 *  Constructor meant for incoming packets, where the first 2 bytes are packet action and packet family
+	 * Constructor meant for incoming packets, where the first 2 bytes are packet action and packet family
 	 */
 	public Packet(byte[] buffer) {
 		this.buffer = ByteBuffer.wrap(buffer);
 		this.buffer.position(2); // skip packet action and packet family bytes
 	}
 
- 	protected Packet(byte packetFamily, byte packetAction) {
+	protected Packet(byte packetFamily, byte packetAction) {
 		this(packetFamily, packetAction, 1024);
 	}
 
+	/**
+	 * @param size The exact size of the packet, excluding the first 4 bytes (2 for size, 2 for packet identifiers)
+	 */
 	protected Packet(byte packetFamily, byte packetAction, int size) {
 		buffer = ByteBuffer.allocate(Math.max(2, size + 2));
 		buffer.put(packetAction);
@@ -41,14 +44,14 @@ public class Packet {
 		int endPosition = startPosition + 1;
 
 		// for loop with null statement to search for the end char string marker
-		for(;endPosition < buffer.capacity() && buffer.get() != BREAK_CHAR; endPosition++);
+		for (; endPosition < buffer.capacity() && buffer.get() != BREAK_CHAR; endPosition++) ;
 
 		int length = endPosition - startPosition - 1;
 		return new String(buffer.array(), startPosition, length, StandardCharsets.US_ASCII);
 	}
 
 	public int readByte() {
-		return buffer.get();
+		return buffer.get() & 0xFF;
 	}
 
 	public int readEncodedByte() {
@@ -68,7 +71,15 @@ public class Packet {
 	}
 
 	public int readEncodedInt() {
-		return decodeNumber(buffer.get(), buffer.get(),buffer.get(), buffer.get());
+		return decodeNumber(buffer.get(), buffer.get(), buffer.get(), buffer.get());
+	}
+
+	protected void writeEncodedShort(int value) {
+		buffer.put(encodeNumber(value, 2));
+	}
+
+	protected void writeEncodedInt(int value) {
+		buffer.put(encodeNumber(value, 4));
 	}
 
 	/**
@@ -82,7 +93,7 @@ public class Packet {
 	 * @return Signed PacketFamily as byte value
 	 */
 	public byte getPacketFamilyByte() {
-		return buffer.get(0);
+		return buffer.get(1);
 	}
 
 	/**
@@ -109,8 +120,8 @@ public class Packet {
 
 	protected void addBreakString(String s) {
 		byte[] bytes = s.getBytes(StandardCharsets.US_ASCII);
-		for(int i = 0; i < bytes.length; i++)
-			if(bytes[i] == (byte) 0xFF)
+		for (int i = 0; i < bytes.length; i++)
+			if (bytes[i] == (byte) 0xFF)
 				bytes[i] = 121;
 		buffer.put(bytes);
 		buffer.put((byte) 0xFF);
@@ -126,5 +137,9 @@ public class Packet {
 
 	byte[] getBytes() {
 		return buffer.array();
+	}
+
+	public boolean equals(byte packetFamily, byte packetAction) {
+		return packetFamily == getPacketFamilyByte() && packetAction == getPacketAction();
 	}
 }

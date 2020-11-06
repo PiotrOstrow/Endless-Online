@@ -6,6 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.net.Packet;
 import com.github.piotrostrow.eo.net.ConnectionListener;
+import com.github.piotrostrow.eo.net.PacketAction;
+import com.github.piotrostrow.eo.net.PacketFamily;
 import com.github.piotrostrow.eo.net.constants.LoginReply;
 import com.github.piotrostrow.eo.ui.stages.CharacterSelectStage;
 import com.github.piotrostrow.eo.ui.stages.MainMenuStage;
@@ -38,20 +40,23 @@ public class MainMenuScreen implements Screen, ConnectionListener {
 	@Override
 	public void onDisconnect() {
 		mainMenuStage.disconnected();
+		setStage(mainMenuStage);
 	}
 
 	@Override
 	public void handlePacket(Packet packet) {
-		if(packet instanceof LoginReplyPacket){
+		if (packet.equals(PacketFamily.PACKET_LOGIN, PacketAction.PACKET_REPLY)) {
 			LoginReplyPacket loginReplyPacket = (LoginReplyPacket) packet;
-			if(loginReplyPacket.getReplyCode() == LoginReply.LOGIN_OK){
-				LoginReplyPacket.Character[] characters = loginReplyPacket.getCharacters();
-				for(int i = 0; i < characters.length; i++)
-					characterSelectStage.getCharacterPanel(i).setName(characters[i].name);
-				setStage(characterSelectStage);
-			}else{
-				System.err.println("Login reply error code: " + loginReplyPacket.getReplyCode());
+
+			//TODO: handle errors
+			switch (loginReplyPacket.getReplyCode()) {
+				case LoginReply.LOGIN_OK:
+					characterSelectStage.setCharacters(loginReplyPacket);
+					setStage(characterSelectStage);
+					break;
 			}
+		} else if (packet.equals(PacketFamily.PACKET_WELCOME, PacketAction.PACKET_REPLY)) {
+
 		}
 	}
 

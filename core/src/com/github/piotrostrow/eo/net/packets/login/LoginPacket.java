@@ -1,4 +1,4 @@
-package com.github.piotrostrow.eo.net.packets.init;
+package com.github.piotrostrow.eo.net.packets.login;
 
 import com.github.piotrostrow.eo.net.Packet;
 import com.github.piotrostrow.eo.net.PacketAction;

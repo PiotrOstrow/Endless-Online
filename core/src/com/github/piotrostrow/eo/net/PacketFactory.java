@@ -2,6 +2,7 @@ package com.github.piotrostrow.eo.net;
 
 import com.github.piotrostrow.eo.net.packets.connection.ConnectionPlayerPacket;
 import com.github.piotrostrow.eo.net.packets.login.LoginReplyPacket;
+import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket;
 
 public class PacketFactory {
 
@@ -18,6 +19,9 @@ public class PacketFactory {
 			return new LoginReplyPacket(buffer);
 		if(action == PacketAction.PACKET_PLAYER && family == PacketFamily.PACKET_CONNECTION)
 			return new ConnectionPlayerPacket(buffer);
+
+		if(family == PacketFamily.PACKET_WELCOME && action == PacketAction.PACKET_REPLY)
+			return new WelcomeReplyPacket(buffer);
 
 		return new Packet(buffer);
 	}

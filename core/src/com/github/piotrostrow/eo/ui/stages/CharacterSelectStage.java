@@ -12,7 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.assets.Assets;
+import com.github.piotrostrow.eo.net.Packet;
+import com.github.piotrostrow.eo.net.packets.login.LoginReplyPacket;
+import com.github.piotrostrow.eo.net.packets.login.WelcomeRequestPacket;
 import com.github.piotrostrow.eo.shaders.GfxShader;
 import com.github.piotrostrow.eo.ui.actors.CharacterPanel;
 
@@ -60,18 +64,9 @@ public class CharacterSelectStage extends Stage {
 		table.setWidth(characterPanelTexture.getWidth());
 		addActor(table);
 
-		ClickListener panelClickListener = new ClickListener(){
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				final int id = (Integer) event.getListenerActor().getUserObject();
-				if(id > 0){
-				} else {
-				}
-			}
-		};
-
 		for(int i = 0; i < characterPanels.length; i++){
-			characterPanels[i] = new CharacterPanel();
+			final CharacterPanel characterPanel = characterPanels[i] = new CharacterPanel();
+
 
 			Image background = new Image(characterPanelTexture);
 			background.setPosition(0, 0);
@@ -99,10 +94,23 @@ public class CharacterSelectStage extends Stage {
 			characterPanels[i].characterImage.setScaling(Scaling.none);
 			characterPanels[i].addActor(characterPanels[i].characterImage);
 
+			ClickListener panelClickListener = new ClickListener(){
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					if(characterPanel.hasCharacter()) {
+						int characterID = characterPanel.getCharacterID();
+						if (event.getTarget() == characterPanel.loginButton) {
+							Packet packet = new WelcomeRequestPacket(characterID);
+							Main.client.sendEncodedPacket(packet);
+						} else {
+							//TODO: delete dialog
+						}
+					}
+				}
+			};
+
 			//user object is an indicator of which slot it is, negative number indicated that the delete button has been pressed
-			characterPanels[i].loginButton.setUserObject(i + 1);
 			characterPanels[i].loginButton.addListener(panelClickListener);
-			characterPanels[i].deleteButton.setUserObject((i + 1) * -1);
 			characterPanels[i].deleteButton.addListener(panelClickListener);
 
 			table.add(characterPanels[i]).size(characterPanelTexture.getWidth(), characterPanelTexture.getHeight()).spaceBottom(8);
@@ -126,8 +134,14 @@ public class CharacterSelectStage extends Stage {
 	}
 
 	// TODO: temporary
-	public CharacterPanel getCharacterPanel(int index) {
-		return characterPanels[index];
+	public void setCharacters(LoginReplyPacket loginReplyPacket) {
+		for(CharacterPanel characterPanel : characterPanels)
+			characterPanel.reset();
+
+		LoginReplyPacket.Character[] characters = loginReplyPacket.getCharacters();
+		for(int i = 0; i < characters.length && i < characterPanels.length; i++){
+			characterPanels[i].setCharacter(characters[i]);
+		}
 	}
 
 	private void setActorPositions(){

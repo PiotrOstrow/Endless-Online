@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.assets.Assets;
-import com.github.piotrostrow.eo.net.packets.init.LoginPacket;
+import com.github.piotrostrow.eo.net.packets.login.LoginPacket;
 
 public class LoginWindow extends WidgetGroup {
 
@@ -74,9 +74,6 @@ public class LoginWindow extends WidgetGroup {
 			public void clicked(InputEvent event, float x, float y) {
 				LoginWindow.this.setVisible(false);
 				if(event.getTarget() == loginButton){
-					//TODO: login
-					System.out.println("Login clicked");
-
 					Main.client.sendEncodedPacket(new LoginPacket("pepega131", "asdasd"));
 				}
 

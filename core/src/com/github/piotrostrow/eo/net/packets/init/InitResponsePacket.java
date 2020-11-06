@@ -11,6 +11,10 @@ public class InitResponsePacket extends Packet {
 		super(buffer);
 	}
 
+	public int getInitReply() {
+		return buffer.get(2);
+	}
+
 	public byte getSeqBytes1() {
 		return buffer.get(3);
 	}
@@ -29,9 +33,5 @@ public class InitResponsePacket extends Packet {
 
 	public short getClientID() {
 		return buffer.getShort(7);
-	}
-
-	public int getInitReply() {
-		return buffer.get(2);
 	}
 }
