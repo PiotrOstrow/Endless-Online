@@ -1,4 +1,4 @@
-package com.github.piotrostrow.eo.screens;
+package com.github.piotrostrow.eo.ui.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -56,7 +56,7 @@ public class MainMenuScreen implements Screen, ConnectionListener {
 			//TODO: handle errors
 			switch (loginReplyPacket.getReplyCode()) {
 				case LoginReply.LOGIN_OK:
-					characterSelectStage.setCharacters(loginReplyPacket);
+					Gdx.app.postRunnable(() -> characterSelectStage.setCharacters(loginReplyPacket));
 					setStage(characterSelectStage);
 					break;
 			}

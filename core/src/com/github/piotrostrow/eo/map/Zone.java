@@ -1,7 +1,5 @@
 package com.github.piotrostrow.eo.map;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.piotrostrow.eo.character.CharacterEntity;
 import com.github.piotrostrow.eo.map.emf.EmfMap;
@@ -16,7 +14,7 @@ public class Zone implements Disposable {
 	private final ArrayList<CharacterEntity> characters = new ArrayList<>();
 
 	public Zone(EmfMap map) {
-		mapRenderer = new EmfMapRenderer(map);
+		mapRenderer = new EmfMapRenderer(map, characters);
 	}
 
 	public void addCharacter(CharacterEntity character) {
@@ -24,7 +22,8 @@ public class Zone implements Disposable {
 	}
 
 	public void update(){
-
+		for(CharacterEntity character : characters)
+			character.update();
 	}
 
 	public void render() {

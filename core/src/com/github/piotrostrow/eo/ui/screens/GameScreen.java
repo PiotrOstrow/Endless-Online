@@ -1,10 +1,10 @@
-package com.github.piotrostrow.eo.screens;
+package com.github.piotrostrow.eo.ui.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.assets.Assets;
-import com.github.piotrostrow.eo.character.CharacterEntity;
 import com.github.piotrostrow.eo.character.Player;
 import com.github.piotrostrow.eo.map.Zone;
 import com.github.piotrostrow.eo.net.ConnectionListener;
@@ -26,7 +26,7 @@ public class GameScreen implements Screen, ConnectionListener {
 			Player characterEntity = new Player(character);
 			currentZone.addCharacter(characterEntity);
 
-			if(character.playerID == welcomeReplyPacket1.getCharacterID())
+			if(character.playerID == welcomeReplyPacket1.getPlayerID())
 				this.player = characterEntity;
 		}
 	}
@@ -36,12 +36,24 @@ public class GameScreen implements Screen, ConnectionListener {
 
 	}
 
+	private void input() {
+		if(Gdx.input.isKeyJustPressed(Input.Keys.W))
+			player.getPosition().y++;
+		if(Gdx.input.isKeyJustPressed(Input.Keys.S))
+			player.getPosition().y--;
+		if(Gdx.input.isKeyJustPressed(Input.Keys.A))
+			player.getPosition().x--;
+		if(Gdx.input.isKeyJustPressed(Input.Keys.D))
+			player.getPosition().x++;
+	}
+
 	private void update(){
 		currentZone.update();
 	}
 
 	@Override
 	public void render(float delta) {
+		input();
 		update();
 
 		currentZone.render();
@@ -80,8 +92,10 @@ public class GameScreen implements Screen, ConnectionListener {
 
 	@Override
 	public void onDisconnect() {
-		dispose();
-		Gdx.app.postRunnable(() -> Main.instance.setScreen(new MainMenuScreen()));
+		Gdx.app.postRunnable(() -> {
+			dispose();
+			Main.instance.setScreen(new MainMenuScreen());
+		});
 	}
 
 	@Override

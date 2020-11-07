@@ -73,8 +73,10 @@ public class LoginWindow extends WidgetGroup {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				LoginWindow.this.setVisible(false);
+				String username = loginField.getText().trim().length() == 0 ? "pepega131" : loginField.getText();
+				String password = passwordField.getText().trim().length() == 0 ? "asdasd" : passwordField.getText();
 				if(event.getTarget() == loginButton){
-					Main.client.sendEncodedPacket(new LoginPacket("pepega131", "asdasd"));
+					Main.client.sendEncodedPacket(new LoginPacket(username, password));
 				}
 
 				loginField.setText("");

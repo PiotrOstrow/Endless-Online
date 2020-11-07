@@ -15,7 +15,7 @@ public class PacketEncoder {
 	private int receiveMultiplier;
 
 	private int calculateNextSequenceNumber() {
-		var sequenceStart = initialSequence;
+		int sequenceStart = initialSequence;
 		sequenceIncrement = (sequenceIncrement + 1) % 10;
 		return sequenceStart + sequenceIncrement;
 	}

@@ -65,34 +65,7 @@ public class CharacterSelectStage extends Stage {
 		addActor(table);
 
 		for(int i = 0; i < characterPanels.length; i++){
-			final CharacterPanel characterPanel = characterPanels[i] = new CharacterPanel();
-
-
-			Image background = new Image(characterPanelTexture);
-			background.setPosition(0, 0);
-			characterPanels[i].addActor(background);
-			characterPanels[i].setSize(characterPanelTexture.getWidth(), characterPanelTexture.getHeight());
-
-			characterPanels[i].nameLabel = new Label("", labelStyle);
-			characterPanels[i].nameLabel.setSize(89, 22);
-			characterPanels[i].nameLabel.setPosition(162, 75);
-			characterPanels[i].nameLabel.setAlignment(Align.center);
-			characterPanels[i].nameLabel.setWrap(false);
-			characterPanels[i].addActor(characterPanels[i].nameLabel);
-
-			characterPanels[i].loginButton = new Button(loginButtonStyle);
-			characterPanels[i].loginButton.setPosition(161 , 38);
-			characterPanels[i].addActor(characterPanels[i].loginButton);
-
-			characterPanels[i].deleteButton = new Button(deleteButtonStyle);
-			characterPanels[i].deleteButton.setPosition(161, 10);
-			characterPanels[i].addActor(characterPanels[i].deleteButton);
-
-			characterPanels[i].characterImage = new Image();
-			characterPanels[i].characterImage.setSize(100, 106);
-			characterPanels[i].characterImage.setPosition(27, 9);
-			characterPanels[i].characterImage.setScaling(Scaling.none);
-			characterPanels[i].addActor(characterPanels[i].characterImage);
+			final CharacterPanel characterPanel = characterPanels[i] = new CharacterPanel(characterPanelTexture, labelStyle, loginButtonStyle, deleteButtonStyle);
 
 			ClickListener panelClickListener = new ClickListener(){
 				@Override
@@ -109,7 +82,6 @@ public class CharacterSelectStage extends Stage {
 				}
 			};
 
-			//user object is an indicator of which slot it is, negative number indicated that the delete button has been pressed
 			characterPanels[i].loginButton.addListener(panelClickListener);
 			characterPanels[i].deleteButton.addListener(panelClickListener);
 
@@ -119,10 +91,23 @@ public class CharacterSelectStage extends Stage {
 
 		table.pack();
 
+		ClickListener buttonClickListener = new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if(event.getTarget() == cancelButton) {
+					Main.client.disconnect();
+				} else {
+					//TODO: create dialog
+				}
+			}
+		};
+
 		createButton = new Button(createButtonStyle);
+		createButton.addListener(buttonClickListener);
 		addActor(createButton);
 
 		cancelButton = new Button(cancelButtonStyle);
+		cancelButton.addListener(buttonClickListener);
 		addActor(cancelButton);
 
 		table.setY(50 + createButton.getHeight() + 10);

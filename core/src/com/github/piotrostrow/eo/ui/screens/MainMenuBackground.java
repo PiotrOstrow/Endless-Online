@@ -1,4 +1,4 @@
-package com.github.piotrostrow.eo.screens;
+package com.github.piotrostrow.eo.ui.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
