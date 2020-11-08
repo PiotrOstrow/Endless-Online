@@ -13,10 +13,10 @@ public class MapChest {
 	public final int spawn_time;
 	public final int item_amount;
 
-	MapChest(EmfFileInputStream stream, int mapHeight, int chestID) throws IOException {
+	MapChest(EmfFileInputStream stream, int chestID) throws IOException {
 		this.chestID = chestID;
 		x = stream.readUnsignedByte();
-		y = mapHeight - 1 - stream.readUnsignedByte();
+		y = stream.readUnsignedByte();
 		key_required = stream.readUnsignedShort();
 		chest_slot = stream.readUnsignedByte();
 		item_id = stream.readUnsignedShort();

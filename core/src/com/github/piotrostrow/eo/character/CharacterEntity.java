@@ -9,9 +9,18 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 	protected final GridPoint2 position = new GridPoint2();
 	protected int direction;
 
+	protected CharacterState characterState = CharacterState.IDLE;
+
 	public abstract void update();
 
 	public abstract void render(SpriteBatch batch, float x, float y);
+
+	public abstract int getID();
+
+	public void move(int direction, int x, int y){
+		position.set(x, y);
+		this.direction = direction;
+	}
 
 	public GridPoint2 getPosition() {
 		return position;

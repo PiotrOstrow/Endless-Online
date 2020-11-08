@@ -1,9 +1,10 @@
-package com.github.piotrostrow.eo.ui.screens;
+package com.github.piotrostrow.eo.mainmenu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.github.piotrostrow.eo.Main;
+import com.github.piotrostrow.eo.game.GameScreen;
 import com.github.piotrostrow.eo.net.Packet;
 import com.github.piotrostrow.eo.net.ConnectionListener;
 import com.github.piotrostrow.eo.net.PacketAction;

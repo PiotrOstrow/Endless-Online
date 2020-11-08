@@ -37,7 +37,7 @@ public class MapLayer {
 		for(int y = 0; y < gfx.length; y++)
 			for(int x = 0; x < gfx[y].length; x++)
 				if(gfx[y][x] != 0)
-					setTile(gfx[y][x] + 100, layerIndex, x, height - 1 - y, timestamp);
+					setTile(gfx[y][x] + 100, layerIndex, x, y, timestamp);
 	}
 
 	void setTile(int gfxID, int layerIndex, int x, int y, long timestamp){

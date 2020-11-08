@@ -1,4 +1,4 @@
-package com.github.piotrostrow.eo.ui.screens;
+package com.github.piotrostrow.eo.mainmenu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -67,11 +67,12 @@ public class MainMenuBackground implements Disposable {
 			float x = (float) Math.sin(time) * 1000;
 			float y = (float) Math.cos(time) * 1000;
 
-			mapRenderer.camera.position.set(position.x + 4300 + x, position.y + 425 + y, 0);
+			mapRenderer.camera.position.set(position.x - 450 + x, position.y - 2125 + y, 0);
 		} else {
-			mapRenderer.camera.position.set(position.x + 3050, position.y + 425, 0);
+			mapRenderer.camera.position.set(position.x + -3050, position.y + -425, 0);
 		}
 
+		mapRenderer.camera.zoom = 1f;
 		mapRenderer.camera.update();
 	}
 

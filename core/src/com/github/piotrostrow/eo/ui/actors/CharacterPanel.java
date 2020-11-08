@@ -74,7 +74,14 @@ public class CharacterPanel extends WidgetGroup implements Disposable {
 			@Override
 			public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
 				super.exit(event, x, y, pointer, toActor);
-				if(playerTextureAtlas != null)
+				if(!isOver() && playerTextureAtlas != null)
+					textureRegionDrawable.setRegion(playerTextureAtlas.get(CharacterState.SIT_GROUND, Direction.DOWN, 0));
+			}
+
+			@Override
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				super.touchUp(event, x, y, pointer, button);
+				if(!isOver() && playerTextureAtlas != null)
 					textureRegionDrawable.setRegion(playerTextureAtlas.get(CharacterState.SIT_GROUND, Direction.DOWN, 0));
 			}
 		});

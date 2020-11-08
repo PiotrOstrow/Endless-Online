@@ -22,7 +22,7 @@ public class TileSpecs {
 				int c = stream.readUnsignedByte();
 				if(x < width && y < height) { // TODO: check negatives? lol
 					//tileSpecs.add(new EmfTileSpec(x, y, c));
-					specs[x][height - y - 1] = (byte) (c + 1);
+					specs[x][y] = (byte) (c + 1);
 				}
 			}
 		}

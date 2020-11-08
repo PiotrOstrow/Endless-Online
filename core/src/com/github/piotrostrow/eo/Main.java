@@ -5,7 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.github.piotrostrow.eo.assets.Assets;
 import com.github.piotrostrow.eo.net.Client;
-import com.github.piotrostrow.eo.ui.screens.MainMenuScreen;
+import com.github.piotrostrow.eo.mainmenu.MainMenuScreen;
 
 public class Main extends Game {
 

@@ -1,4 +1,4 @@
-package com.github.piotrostrow.eo.ui.screens;
+package com.github.piotrostrow.eo.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -11,16 +11,21 @@ import com.github.piotrostrow.eo.net.ConnectionListener;
 import com.github.piotrostrow.eo.net.Packet;
 import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket1;
 import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket2;
+import com.github.piotrostrow.eo.mainmenu.MainMenuScreen;
 
-public class GameScreen implements Screen, ConnectionListener {
+public class GameScreen implements Screen {
 
 	private Zone currentZone;
 
 	private Player player;
 
+	private final PacketHandler packetHandler;
+
 	public GameScreen(WelcomeReplyPacket1 welcomeReplyPacket1, WelcomeReplyPacket2 welcomeReplyPacket2) {
+		packetHandler = new PacketHandler(this);
+		Main.client.setConnectionListener(packetHandler);
+
 		currentZone = new Zone(Assets.getMap(welcomeReplyPacket1.getMapID()));
-		Main.client.setConnectionListener(this);
 
 		for(WelcomeReplyPacket2.Character character : welcomeReplyPacket2.characters){
 			Player characterEntity = new Player(character);
@@ -38,9 +43,9 @@ public class GameScreen implements Screen, ConnectionListener {
 
 	private void input() {
 		if(Gdx.input.isKeyJustPressed(Input.Keys.W))
-			player.getPosition().y++;
-		if(Gdx.input.isKeyJustPressed(Input.Keys.S))
 			player.getPosition().y--;
+		if(Gdx.input.isKeyJustPressed(Input.Keys.S))
+			player.getPosition().y++;
 		if(Gdx.input.isKeyJustPressed(Input.Keys.A))
 			player.getPosition().x--;
 		if(Gdx.input.isKeyJustPressed(Input.Keys.D))
@@ -85,21 +90,7 @@ public class GameScreen implements Screen, ConnectionListener {
 			currentZone.dispose();
 	}
 
-	@Override
-	public void onConnect() {
-
-	}
-
-	@Override
-	public void onDisconnect() {
-		Gdx.app.postRunnable(() -> {
-			dispose();
-			Main.instance.setScreen(new MainMenuScreen());
-		});
-	}
-
-	@Override
-	public void handlePacket(Packet packet) {
-
+	Zone getZone() {
+		return currentZone;
 	}
 }

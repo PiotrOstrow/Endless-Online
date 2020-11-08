@@ -107,8 +107,8 @@ public class EmfMapRenderer implements Disposable {
 		int itemCounter = 0;
 		for (int col = col1; col <= col2; col++) {
 			for (int row = row2; row >= row1; row--) {
-				float x = (col * 32) + (row * 32);
-				float y = (row * 16) - (col * 16);
+				float x = (col * 32) - (row * 32);
+				float y = -((row * 16) + (col * 16));
 
 				MapTile wallsSouthLayerTile = map.wallsSouthLayer.getTile(col, row);
 				if (wallsSouthLayerTile != null)
@@ -154,11 +154,10 @@ public class EmfMapRenderer implements Disposable {
 
 	private void renderShadowLayer() {
 		batch.setColor(1, 1, 1, 0.5f);
-
-		for (int row = row2; row >= row1; row--) {
-			for (int col = col1; col <= col2; col++) {
-				float x = (col * 32) + (row * 32);
-				float y = (row * 16) - (col * 16);
+		for(int col = col2; col >= col1; col--) {
+			for (int row = row2; row >= row1; row--) {
+				float x = (col * 32) - (row * 32);
+				float y = -((row * 16) + (col * 16));
 
 				MapTile tile = map.shadowLayer.getTile(col, row);
 				if (tile == null) continue;
@@ -180,13 +179,10 @@ public class EmfMapRenderer implements Disposable {
 	}
 
 	private void renderLayer(MapLayer layer, float xOffset, float yOffset) {
-//		if (!layer.isVisible())
-//			return;
-
-		for (int row = row2; row >= row1; row--) {
-			for (int col = col1; col <= col2; col++) {
-				float x = (col * 32) + (row * 32);
-				float y = (row * 16) - (col * 16);
+		for(int col = col2; col >= col1; col--) {
+			for (int row = row2; row >= row1; row--) {
+				float x = (col * 32) - (row * 32);
+				float y = -((row * 16) + (col * 16));
 
 				MapTile tile = layer.getTile(col, row);
 
@@ -213,6 +209,12 @@ public class EmfMapRenderer implements Disposable {
 
 		col1 = Math.max(0, col1);
 		col2 = Math.min(map.getWidth() - 1, col2);
+
+		col1 = 0;
+		col2 = map.getWidth() - 1;
+
+		row1 = 0;
+		row2 = map.getWidth() - 1;
 	}
 
 	private Vector3 translateScreenToIso(Vector2 vec) {
