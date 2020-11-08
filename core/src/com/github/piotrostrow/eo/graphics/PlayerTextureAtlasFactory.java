@@ -17,16 +17,16 @@ import java.util.Queue;
 public class PlayerTextureAtlasFactory {
 
 	public static PlayerTextureAtlas create(LoginReplyPacket.Character character) {
-		return create(character.race, character.gender, character.hairstyle, character.haircolor);
+		return create(character.race, character.gender, character.hairstyle, character.haircolor, character.armor, character.boots);
 	}
 
 	public static PlayerTextureAtlas create(WelcomeReplyPacket2.Character character) {
-		return create(character.race, character.gender, character.hairstyle, character.haircolor);
+		return create(character.race, character.gender, character.hairstyle, character.haircolor, character.armor, character.boots);
 	}
 
-	public static PlayerTextureAtlas create(int race, int gender, int hairstyle, int haircolor) {
+	public static PlayerTextureAtlas create(int race, int gender, int hairstyle, int haircolor, int armor, int boots) {
 		PlayerTextureAtlasFactory factory = new PlayerTextureAtlasFactory();
-		factory.render(race, gender, hairstyle, haircolor);
+		factory.render(race, gender, hairstyle, haircolor, armor, boots);
 
 
 		return new PlayerTextureAtlas(factory.idle, factory.movement, factory.attack, factory.spell, factory.sitChair, factory.sitGround, factory.attackBow);
@@ -126,32 +126,32 @@ public class PlayerTextureAtlasFactory {
 		}
 	}
 
-	private void render(int race, int gender, int hairstyle, int haircolor) {
+	private void render(int race, int gender, int hairstyle, int haircolor, int armor, int boots) {
 		frameBuffer.begin();
 		spriteBatch.begin();
 		projection.setToOrtho(0, atlasWidth, atlasHeight, 0, 0, 100);
 		spriteBatch.setProjectionMatrix(projection);
 
 		drawHairBottom(gender, hairstyle, haircolor);
-
 		drawCharacter(race, gender);
-
+		drawBoots(gender, boots);
+		drawArmor(gender, armor);
 		drawHairTop(gender, hairstyle, haircolor);
 
 		spriteBatch.end();
 
-		ShapeRenderer shapeRenderer = new ShapeRenderer();
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-		shapeRenderer.setProjectionMatrix(projection);
+//		ShapeRenderer shapeRenderer = new ShapeRenderer();
+//		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+//		shapeRenderer.setProjectionMatrix(projection);
 
 //		for (int x = 0; x < atlasWidth; x += regionWidth)
 //			shapeRenderer.line(x, 0, x, atlasHeight);
 //
 //		for (int y = 0; y < atlasHeight; y += regionHeight)
 //			shapeRenderer.line(0, y, atlasWidth, y);
-
-		shapeRenderer.end();
-		shapeRenderer.dispose();
+//
+//		shapeRenderer.end();
+//		shapeRenderer.dispose();
 
 		frameBuffer.end();
 		frameBuffer.dispose();
@@ -164,6 +164,131 @@ public class PlayerTextureAtlasFactory {
 		fix(sitChair);
 		fix(sitGround);
 		fix(attackBow);
+	}
+
+	// TODO: fix offsets
+	private void drawBoots(int gender, int boots) {
+		if(boots == 0)
+			return;
+
+		Texture[] textures = new Texture[16];
+
+		int folder = gender == 1 ? 11 : 12;
+		for(int i = 0; i < textures.length; i++)
+			textures[i] = Assets.gfx(folder, 101 + i);
+
+		if(gender == 1) {
+			drawTexture(textures[0], aIdle, idle[0], -8, -5);
+			drawTexture(textures[1], aIdle, idle[1], -8, -6);
+
+			for(int i = 0; i < 8; i++)
+				drawTexture(textures[2 + i], aMovement, movement[i], -4, -2);
+
+			drawTexture(textures[0], aSpell, spell[0], -8, -5);
+			drawTexture(textures[1], aSpell, spell[1], -8, -5);
+
+			drawTexture(textures[0], aAttack, attack[0], -3, -5);
+			drawTexture(textures[10], aAttack, attack[1], -7, -5);
+			drawTexture(textures[1], aAttack, attack[2], -3, -5);
+			drawTexture(textures[11], aAttack, attack[3], -7, -5);
+
+			drawTexture(textures[12], aSitChair, sitChair[0], -2, -3);
+			drawTexture(textures[13], aSitChair, sitChair[1], -2, 4);
+
+			drawTexture(textures[14], aSitGround, sitGround[0], -2, -7);
+			drawTexture(textures[15], aSitGround, sitGround[1], -2, 1);
+
+			drawTexture(textures[10], aAttackBow, attackBow[0], -3, -5);
+			drawTexture(textures[11], aAttackBow, attackBow[1], -6, -5);
+		} else {
+			drawTexture(textures[0], aIdle, idle[0], -8, -6);
+			drawTexture(textures[1], aIdle, idle[1], -8, -5);
+
+			for(int i = 0; i < 4; i++) {
+				drawTexture(textures[2 + i], aMovement, movement[i], -4, -2);
+				drawTexture(textures[6 + i], aMovement, movement[4 + i], -4, -2);
+			}
+
+			drawTexture(textures[0], aSpell, spell[0], -8, -5);
+			drawTexture(textures[1], aSpell, spell[1], -8, -5);
+
+			drawTexture(textures[0], aAttack, attack[0], -3, -5);
+			drawTexture(textures[10], aAttack, attack[1], -7, -5);
+			drawTexture(textures[1], aAttack, attack[2], -3, -5);
+			drawTexture(textures[11], aAttack, attack[3], -7, -5);
+
+			drawTexture(textures[12], aSitChair, sitChair[0], -2, -3);
+			drawTexture(textures[13], aSitChair, sitChair[1], -2, 4);
+
+			drawTexture(textures[14], aSitGround, sitGround[0], -2, -7);
+			drawTexture(textures[15], aSitGround, sitGround[1], -2, 1);
+
+			drawTexture(textures[10], aAttackBow, attackBow[0], -3, -5);
+			drawTexture(textures[11], aAttackBow, attackBow[1], -6, -5);
+		}
+	}
+
+	// TODO: check if offsets accurate
+	private void drawArmor(int gender, int armor) {
+		if(armor == 0)
+			return;
+
+		Texture[] textures = new Texture[22];
+
+		int folder = gender == 1 ? 13 : 14;
+		for(int i = 0; i < textures.length; i++) {
+			textures[i] = Assets.gfx(folder, 101 + i + (armor - 1) * 50);
+		}
+
+		if(gender == 1) {
+			drawTexture(textures[0], aIdle, idle[0], -8, -6);
+			drawTexture(textures[1], aIdle, idle[1], -8, -6);
+
+			for (int i = 0; i < 4; i++) {
+				drawTexture(textures[2 + i], aMovement, movement[i], -3, -3);
+				drawTexture(textures[6 + i], aMovement, movement[4 + i], -4, -3);
+			}
+
+			drawTexture(textures[10], aSpell, spell[0], -8, -6);
+			drawTexture(textures[11], aSpell, spell[1], -8, -6);
+
+			drawTexture(textures[12], aAttack, attack[0], -3, -6);
+			drawTexture(textures[13], aAttack, attack[1], -7, -6);
+			drawTexture(textures[14], aAttack, attack[2], -3, -6);
+			drawTexture(textures[15], aAttack, attack[3], -7, -6);
+
+			drawTexture(textures[16], aSitChair, sitChair[0], -2, -6);
+			drawTexture(textures[17], aSitChair, sitChair[1], -2, -6);
+
+			drawTexture(textures[18], aSitGround, sitGround[0], -2, -15);
+			drawTexture(textures[19], aSitGround, sitGround[1], -2, -15);
+
+			drawTexture(textures[20], aAttackBow, attackBow[0], -3, -6);
+			drawTexture(textures[21], aAttackBow, attackBow[1], -3, -6);
+		} else {
+			drawTexture(textures[0], aIdle, idle[0], -8, -7);
+			drawTexture(textures[1], aIdle, idle[1], -8, -7);
+
+			for (int i = 0; i < 8; i++)
+				drawTexture(textures[2 + i], aMovement, movement[i], -4, -4);
+
+			drawTexture(textures[10], aSpell, spell[0], -8, -7);
+			drawTexture(textures[11], aSpell, spell[1], -8, -7);
+
+			drawTexture(textures[12], aAttack, attack[0], -4, -7);
+			drawTexture(textures[13], aAttack, attack[1], -6, -7);
+			drawTexture(textures[14], aAttack, attack[2], -4, -7);
+			drawTexture(textures[15], aAttack, attack[3], -6, -7);
+
+			drawTexture(textures[16], aSitChair, sitChair[0], -3, -5);
+			drawTexture(textures[17], aSitChair, sitChair[1], -2, -5);
+
+			drawTexture(textures[18], aSitGround, sitGround[0], -4, -14);
+			drawTexture(textures[19], aSitGround, sitGround[1], -2, -14);
+
+			drawTexture(textures[20], aAttackBow, attackBow[0], -4, -7);
+			drawTexture(textures[21], aAttackBow, attackBow[1], -4, -7);
+		}
 	}
 
 	private void drawHairBottom(int gender, int hairstyle, int haircolor) {
@@ -192,67 +317,67 @@ public class PlayerTextureAtlasFactory {
 		}
 	}
 
-	private void drawHair(Texture hair, TextureRegion[][] src, TextureRegion dst, int xOffset, int yOffset) {
+	private void drawTexture(Texture texture, TextureRegion[][] src, TextureRegion dst, int xOffset, int yOffset) {
 		xOffset += regionWidth / 2 - src[0][0].getRegionWidth() / 2;
 		yOffset += regionHeight / 2 - src[0][0].getRegionHeight() / 2;
-		spriteBatch.draw(hair, dst.getRegionX() + xOffset, dst.getRegionY() + yOffset);
+		spriteBatch.draw(texture, dst.getRegionX() + xOffset, dst.getRegionY() + yOffset);
 	}
 
 	private void drawHair(int gender, Texture hair1, Texture hair2) {
 		if(gender == 1) {
-			drawHair(hair1, aIdle, idle[0], -6, 17);
-			drawHair(hair2, aIdle, idle[1], -6, 17);
+			drawTexture(hair1, aIdle, idle[0], -6, 17);
+			drawTexture(hair2, aIdle, idle[1], -6, 17);
 
 			for(int i = 0; i < 4; i++) // move down
-				drawHair(hair1, aMovement, movement[i], -1, 19);
+				drawTexture(hair1, aMovement, movement[i], -1, 19);
 
 			for(int i = 4; i < 8; i++) // move left
-				drawHair(hair2, aMovement, movement[i], -2, 19);
+				drawTexture(hair2, aMovement, movement[i], -2, 19);
 
-			drawHair(hair1, aAttack, attack[0], -1, 17);
-			drawHair(hair1, aAttack, attack[1], -7, 13);
+			drawTexture(hair1, aAttack, attack[0], -1, 17);
+			drawTexture(hair1, aAttack, attack[1], -7, 13);
 
-			drawHair(hair2, aAttack, attack[2], -1, 17);
-			drawHair(hair2, aAttack, attack[3], -5, 16);
+			drawTexture(hair2, aAttack, attack[2], -1, 17);
+			drawTexture(hair2, aAttack, attack[3], -5, 16);
 
-			drawHair(hair1, aSpell ,spell[0], -6, 17);
-			drawHair(hair2, aSpell, spell[1], -6, 17);
+			drawTexture(hair1, aSpell ,spell[0], -6, 17);
+			drawTexture(hair2, aSpell, spell[1], -6, 17);
 
-			drawHair(hair1, aSitChair, sitChair[0], 0, 11);
-			drawHair(hair2, aSitChair, sitChair[1], 0, 11);
+			drawTexture(hair1, aSitChair, sitChair[0], 0, 11);
+			drawTexture(hair2, aSitChair, sitChair[1], 0, 11);
 
-			drawHair(hair1, aSitGround, sitGround[0], 0, 2);
-			drawHair(hair2, aSitGround, sitGround[1], 2, 2);
+			drawTexture(hair1, aSitGround, sitGround[0], 0, 2);
+			drawTexture(hair2, aSitGround, sitGround[1], 2, 2);
 
-			drawHair(hair1, aAttackBow, attackBow[0], 2, 17);
-			drawHair(hair2, aAttackBow, attackBow[1], 0, 17);
+			drawTexture(hair1, aAttackBow, attackBow[0], 2, 17);
+			drawTexture(hair2, aAttackBow, attackBow[1], 0, 17);
 		} else {
-			drawHair(hair1, aIdle, idle[0], -6, 16);
-			drawHair(hair2, aIdle, idle[1], -6, 16);
+			drawTexture(hair1, aIdle, idle[0], -6, 16);
+			drawTexture(hair2, aIdle, idle[1], -6, 16);
 
 			for(int i = 0; i < 4; i++) // move down
-				drawHair(hair1, aMovement, movement[i], -2, 18);
+				drawTexture(hair1, aMovement, movement[i], -2, 18);
 
 			for(int i = 4; i < 8; i++) // move left
-				drawHair(hair2, aMovement, movement[i], -2, 18);
+				drawTexture(hair2, aMovement, movement[i], -2, 18);
 
-			drawHair(hair1, aAttack, attack[0], -2, 16);
-			drawHair(hair1, aAttack, attack[1], -6, 11);
+			drawTexture(hair1, aAttack, attack[0], -2, 16);
+			drawTexture(hair1, aAttack, attack[1], -6, 11);
 
-			drawHair(hair2, aAttack, attack[2], -2, 16);
-			drawHair(hair2, aAttack, attack[3], -6, 15);
+			drawTexture(hair2, aAttack, attack[2], -2, 16);
+			drawTexture(hair2, aAttack, attack[3], -6, 15);
 
-			drawHair(hair1, aSpell ,spell[0], -6, 16);
-			drawHair(hair2, aSpell, spell[1], -6, 16);
+			drawTexture(hair1, aSpell ,spell[0], -6, 16);
+			drawTexture(hair2, aSpell, spell[1], -6, 16);
 
-			drawHair(hair1, aSitChair, sitChair[0], -1, 12);
-			drawHair(hair2, aSitChair, sitChair[1], 0, 12);
+			drawTexture(hair1, aSitChair, sitChair[0], -1, 12);
+			drawTexture(hair2, aSitChair, sitChair[1], 0, 12);
 
-			drawHair(hair1, aSitGround, sitGround[0], -1, 3);
-			drawHair(hair2, aSitGround, sitGround[1], 1, 3);
+			drawTexture(hair1, aSitGround, sitGround[0], -1, 3);
+			drawTexture(hair2, aSitGround, sitGround[1], 1, 3);
 
-			drawHair(hair1, aAttackBow, attackBow[0], 3, 17);
-			drawHair(hair2, aAttackBow, attackBow[1], 1, 16);
+			drawTexture(hair1, aAttackBow, attackBow[0], 3, 17);
+			drawTexture(hair2, aAttackBow, attackBow[1], 1, 16);
 		}
 	}
 

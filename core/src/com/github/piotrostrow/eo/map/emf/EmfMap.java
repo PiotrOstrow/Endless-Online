@@ -76,7 +76,7 @@ public class EmfMap {
 		int mapChestCount = stream.readUnsignedByte();
 		mapChests = new ArrayList<MapChest>(mapChestCount);
 		for(int i = 0; i < mapChestCount; i++){
-			MapChest mapChest = new MapChest(stream, height, i);
+			MapChest mapChest = new MapChest(stream, i);
 			mapChests.add(mapChest);
 		}
 

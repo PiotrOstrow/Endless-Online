@@ -122,6 +122,7 @@ public class Client {
 
 			// TODO: check what is sent here
 			Packet reply = new Packet(PacketFamily.PACKET_CONNECTION, PacketAction.PACKET_PING);
+			reply.writeEncodedByte(106);
 			sendEncodedPacket(reply);
 		}
 	}

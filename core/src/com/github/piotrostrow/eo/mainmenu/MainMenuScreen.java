@@ -60,6 +60,9 @@ public class MainMenuScreen implements Screen, ConnectionListener {
 					Gdx.app.postRunnable(() -> characterSelectStage.setCharacters(loginReplyPacket));
 					setStage(characterSelectStage);
 					break;
+				default:
+					System.err.println("Login error code: " + loginReplyPacket.getReplyCode());
+					break;
 			}
 		} else if (packet.equals(PacketFamily.PACKET_WELCOME, PacketAction.PACKET_REPLY)) {
 			if(packet instanceof WelcomeReplyPacket1){

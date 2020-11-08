@@ -1,8 +1,6 @@
 package com.github.piotrostrow.eo.ui.actors;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -104,11 +102,6 @@ public class CharacterPanel extends WidgetGroup implements Disposable {
 		// TODO: after implementing enter in login window, check what happens when mouse is already over the panel
 		textureRegionDrawable.setRegion(playerTextureAtlas.get(CharacterState.SIT_GROUND, Direction.DOWN, 0));
 		characterImage.setDrawable(textureRegionDrawable);
-	}
-
-	@Override
-	public void act(float delta) {
-		super.act(delta);
 	}
 
 	private void setNameLabel(String name) {

@@ -84,6 +84,10 @@ public class Packet {
 		return decodeNumber(buffer.get(position), buffer.get(position + 1), buffer.get(position + 2), buffer.get(position + 3));
 	}
 
+	protected void writeEncodedByte(int value) {
+		buffer.put(encodeNumber(value, 1));
+	}
+
 	protected void writeEncodedShort(int value) {
 		buffer.put(encodeNumber(value, 2));
 	}
