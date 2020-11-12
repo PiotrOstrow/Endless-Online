@@ -9,7 +9,7 @@ import com.github.piotrostrow.eo.net.PacketFamily;
  */
 public class WelcomeRequestPacket extends Packet {
 	public WelcomeRequestPacket(int characterID) {
-		super(PacketFamily.PACKET_WELCOME, PacketAction.PACKET_REQUEST, 4);
+		super(PacketFamily.PACKET_WELCOME, PacketAction.PACKET_REQUEST);
 		writeEncodedInt(characterID);
 	}
 }

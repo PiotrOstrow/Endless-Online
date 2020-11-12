@@ -20,14 +20,7 @@ public class Packet {
 	}
 
 	protected Packet(byte packetFamily, byte packetAction) {
-		this(packetFamily, packetAction, 1024);
-	}
-
-	/**
-	 * @param size The exact size of the packet, excluding the first 4 bytes (2 for size, 2 for packet identifiers)
-	 */
-	protected Packet(byte packetFamily, byte packetAction, int size) {
-		buffer = ByteBuffer.allocate(Math.max(2, size + 2));
+		buffer = ByteBuffer.allocate(1024);
 		buffer.put(packetAction);
 		buffer.put(packetFamily);
 	}
@@ -90,6 +83,10 @@ public class Packet {
 
 	protected void writeEncodedShort(int value) {
 		buffer.put(encodeNumber(value, 2));
+	}
+
+	protected void writeEncodedThreeByteInt(int value) {
+		buffer.put(encodeNumber(value, 3));
 	}
 
 	protected void writeEncodedInt(int value) {

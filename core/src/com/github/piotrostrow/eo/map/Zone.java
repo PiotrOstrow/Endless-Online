@@ -2,6 +2,7 @@ package com.github.piotrostrow.eo.map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.piotrostrow.eo.character.CharacterEntity;
 import com.github.piotrostrow.eo.map.emf.EmfMap;
@@ -11,12 +12,14 @@ import java.util.ArrayList;
 
 public class Zone implements Disposable {
 
+	private final EmfMap map;
 	private final EmfMapRenderer mapRenderer;
 
 	private final ArrayList<CharacterEntity> characters = new ArrayList<>();
 
 	public Zone(EmfMap map) {
-		mapRenderer = new EmfMapRenderer(map, characters);
+		this.map = map;
+		this.mapRenderer = new EmfMapRenderer(map, characters);
 	}
 
 	public CharacterEntity getCharacter(int playerID) {
@@ -28,6 +31,19 @@ public class Zone implements Disposable {
 
 	public void addCharacter(CharacterEntity character) {
 		characters.add(character);
+	}
+
+	public boolean isBlocked(GridPoint2 position) {
+		if(position.x < 0 || position.y < 0 || position.x > map.getWidth() || position.y > map.getHeight())
+			return true;
+		if(map.tileSpecs.blocked(position.x, position.y))
+			return true;
+
+		for(CharacterEntity character : characters)
+			if(character.getPosition().equals(position))
+				return true;
+
+		return false;
 	}
 
 	public void update(){

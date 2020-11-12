@@ -30,10 +30,10 @@ public class EmfMap {
 	public final MapLayer ceilingLayer;
 	public final MapLayer roofLayer;
 
-	private final ArrayList<MapChest> mapChests;
-	private final TileSpecs tileSpecs;
-	private final ArrayList<Warp> warps;
-	private final ArrayList<SignMessage> msgs = new ArrayList<>();
+	public final ArrayList<MapChest> mapChests;
+	public final TileSpecs tileSpecs;
+	public final ArrayList<Warp> warps;
+	public final ArrayList<SignMessage> msgs = new ArrayList<>();
 
 	EmfMap(EmfFileInputStream stream) throws IOException {
 		// skip magic number

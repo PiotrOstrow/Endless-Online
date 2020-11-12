@@ -18,6 +18,7 @@ public class GameScreen implements Screen {
 	private Zone currentZone;
 
 	private Player player;
+	private PlayerCharacterController characterController;
 
 	private final PacketHandler packetHandler;
 
@@ -34,6 +35,10 @@ public class GameScreen implements Screen {
 			if(character.playerID == welcomeReplyPacket1.getPlayerID())
 				this.player = characterEntity;
 		}
+
+		// TODO: use input multiplexer when ui is implemented
+		characterController = new PlayerCharacterController(this, player);
+		Gdx.input.setInputProcessor(characterController);
 	}
 
 	@Override
@@ -42,18 +47,12 @@ public class GameScreen implements Screen {
 	}
 
 	private void input() {
-		if(Gdx.input.isKeyJustPressed(Input.Keys.W))
-			player.getPosition().y--;
-		if(Gdx.input.isKeyJustPressed(Input.Keys.S))
-			player.getPosition().y++;
-		if(Gdx.input.isKeyJustPressed(Input.Keys.A))
-			player.getPosition().x--;
-		if(Gdx.input.isKeyJustPressed(Input.Keys.D))
-			player.getPosition().x++;
 	}
 
 	private void update(){
 		currentZone.update();
+
+		characterController.update();
 	}
 
 	@Override
