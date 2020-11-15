@@ -40,6 +40,12 @@ public class PacketHandler implements ConnectionListener {
 			CharacterEntity character = game.getZone().getCharacter(playerID);
 			if(character != null)
 				character.move(direction, x, y);
+		} else if(packet.equals(PacketFamily.PACKET_FACE, PacketAction.PACKET_PLAYER)) {
+			int playerID = packet.readEncodedShort();
+			int direction = packet.readEncodedByte();
+			CharacterEntity player = game.getZone().getCharacter(playerID);
+			if(player != null)
+				player.setDirection(direction);
 		}
 	}
 }

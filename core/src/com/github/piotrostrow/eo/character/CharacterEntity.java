@@ -68,7 +68,6 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 
 	public void move(int direction, int destX, int destY){
 		// if character is not in a grid position that's right next to the destination, the position first has to be adjusted
-		System.out.println(position.dst2(destX, destY));
 		if(position.dst2(destX, destY) > 1) {
 			switch (direction) {
 				case Direction.UP	: position.set(destX, destY + 1); break;
@@ -124,7 +123,6 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 				break;
 		}
 
-
 		TextureRegion textureRegion = getTextureRegion(characterState, direction, frame);
 
 		float xOffset = getXOffset(direction) + (32 - textureRegion.getRegionWidth() / 2f);
@@ -141,8 +139,20 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 		return position;
 	}
 
+	public Vector2 getMovePositionOffset() {
+		return movePositionOffset;
+	}
+
 	public GridPoint2 getRenderingGridPosition() {
 		return renderingPosition;
+	}
+
+	public void setDirection(int direction) {
+		this.direction = direction;
+	}
+
+	public int getDirection() {
+		return direction;
 	}
 
 	@Override

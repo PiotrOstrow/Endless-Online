@@ -3,10 +3,13 @@ package com.github.piotrostrow.eo.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.math.GridPoint2;
 import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.assets.Assets;
 import com.github.piotrostrow.eo.character.Player;
 import com.github.piotrostrow.eo.map.Zone;
+import com.github.piotrostrow.eo.map.emf.EmfMapRenderer;
 import com.github.piotrostrow.eo.net.ConnectionListener;
 import com.github.piotrostrow.eo.net.Packet;
 import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket1;
@@ -20,11 +23,8 @@ public class GameScreen implements Screen {
 	private Player player;
 	private PlayerCharacterController characterController;
 
-	private final PacketHandler packetHandler;
-
 	public GameScreen(WelcomeReplyPacket1 welcomeReplyPacket1, WelcomeReplyPacket2 welcomeReplyPacket2) {
-		packetHandler = new PacketHandler(this);
-		Main.client.setConnectionListener(packetHandler);
+		Main.client.setConnectionListener(new PacketHandler(this));
 
 		currentZone = new Zone(Assets.getMap(welcomeReplyPacket1.getMapID()));
 
@@ -51,8 +51,13 @@ public class GameScreen implements Screen {
 
 	private void update(){
 		currentZone.update();
-
 		characterController.update();
+
+		// set camera position on character
+		Camera camera = currentZone.getMapRenderer().camera;
+		camera.position.x = player.getRenderingGridPosition().x * 32 - player.getRenderingGridPosition().y * 32 + player.getMovePositionOffset().x;
+		camera.position.y = -(player.getRenderingGridPosition().y * 16 + player.getRenderingGridPosition().x * 16) + player.getMovePositionOffset().y;
+		camera.update();
 	}
 
 	@Override

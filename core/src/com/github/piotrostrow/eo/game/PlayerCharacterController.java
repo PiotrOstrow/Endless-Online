@@ -9,12 +9,21 @@ import com.github.piotrostrow.eo.character.CharacterState;
 import com.github.piotrostrow.eo.character.Direction;
 import com.github.piotrostrow.eo.character.Player;
 import com.github.piotrostrow.eo.net.Packet;
+import com.github.piotrostrow.eo.net.packets.walk.FacePlayerPacket;
 import com.github.piotrostrow.eo.net.packets.walk.WalkPlayerPacket;
 
 public class PlayerCharacterController implements InputProcessor {
 
+	/**
+	 * The minimum time between turns in ms, may need adjusting
+	 */
+	private static final int TURN_DELAY = 250;
+
 	private final GameScreen gameScreen;
 	private final Player player;
+
+	private long lastTurn;
+	private CharacterState previousFrameState = CharacterState.IDLE;
 
 	private final GridPoint2 temp = new GridPoint2();
 
@@ -28,11 +37,23 @@ public class PlayerCharacterController implements InputProcessor {
 		if(Gdx.input.isKeyPressed(Input.Keys.S)) move(Direction.DOWN);
 		if(Gdx.input.isKeyPressed(Input.Keys.A)) move(Direction.LEFT);
 		if(Gdx.input.isKeyPressed(Input.Keys.D)) move(Direction.RIGHT);
+
+		previousFrameState = player.getCharacterState();
 	}
 
 	private void move(int direction) {
 		if(player.getCharacterState() != CharacterState.IDLE)
 			return;
+
+		if(lastTurn + TURN_DELAY > System.currentTimeMillis())
+			return;
+
+		if(player.getDirection() != direction && previousFrameState != CharacterState.MOVE) {
+			lastTurn = System.currentTimeMillis();
+			player.setDirection(direction);
+			Main.client.sendEncodedPacket(new FacePlayerPacket(direction));
+			return;
+		}
 
 		temp.set(player.getPosition());
 

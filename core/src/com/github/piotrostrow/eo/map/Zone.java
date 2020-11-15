@@ -61,6 +61,10 @@ public class Zone implements Disposable {
 		mapRenderer.render();
 	}
 
+	public EmfMapRenderer getMapRenderer() {
+		return mapRenderer;
+	}
+
 	@Override
 	public void dispose() {
 		mapRenderer.dispose();
