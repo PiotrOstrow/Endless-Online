@@ -44,10 +44,17 @@ public class NumberEncoder {
 		b &= 0xFF;
 		c &= 0xFF;
 		d &= 0xFF;
+
 		if (a == 254) a = 1;
 		if (b == 254) b = 1;
 		if (c == 254) c = 1;
 		if (d == 254) d = 1;
+
+		if (a == 0) a = 128;
+		if (b == 0) b = 128;
+		if (c == 0) c = 128;
+		if (d == 0) d = 128;
+
 		--a;
 		--b;
 		--c;

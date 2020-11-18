@@ -1,26 +1,23 @@
 package com.github.piotrostrow.eo.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.math.GridPoint2;
 import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.assets.Assets;
-import com.github.piotrostrow.eo.character.Player;
+import com.github.piotrostrow.eo.character.NonPlayerCharacter;
+import com.github.piotrostrow.eo.character.PlayerCharacter;
 import com.github.piotrostrow.eo.map.Zone;
-import com.github.piotrostrow.eo.map.emf.EmfMapRenderer;
-import com.github.piotrostrow.eo.net.ConnectionListener;
-import com.github.piotrostrow.eo.net.Packet;
 import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket1;
 import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket2;
-import com.github.piotrostrow.eo.mainmenu.MainMenuScreen;
+import com.github.piotrostrow.eo.net.structs.NpcData;
+import com.github.piotrostrow.eo.net.structs.PlayerData;
 
 public class GameScreen implements Screen {
 
 	private Zone currentZone;
 
-	private Player player;
+	private PlayerCharacter player;
 	private PlayerCharacterController characterController;
 
 	public GameScreen(WelcomeReplyPacket1 welcomeReplyPacket1, WelcomeReplyPacket2 welcomeReplyPacket2) {
@@ -28,12 +25,17 @@ public class GameScreen implements Screen {
 
 		currentZone = new Zone(Assets.getMap(welcomeReplyPacket1.getMapID()));
 
-		for(WelcomeReplyPacket2.Character character : welcomeReplyPacket2.characters){
-			Player characterEntity = new Player(character);
-			currentZone.addCharacter(characterEntity);
+		for(PlayerData character : welcomeReplyPacket2.characters){
+			PlayerCharacter characterEntity = new PlayerCharacter(character);
+			currentZone.addPlayer(characterEntity);
 
 			if(character.playerID == welcomeReplyPacket1.getPlayerID())
 				this.player = characterEntity;
+		}
+
+		for(NpcData npcData : welcomeReplyPacket2.npcs) {
+			NonPlayerCharacter npc = new NonPlayerCharacter(npcData);
+			currentZone.addNpc(npc);
 		}
 
 		// TODO: use input multiplexer when ui is implemented

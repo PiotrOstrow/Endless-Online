@@ -5,6 +5,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.piotrostrow.eo.character.CharacterEntity;
+import com.github.piotrostrow.eo.character.NonPlayerCharacter;
+import com.github.piotrostrow.eo.character.PlayerCharacter;
 import com.github.piotrostrow.eo.map.emf.EmfMap;
 import com.github.piotrostrow.eo.map.emf.EmfMapRenderer;
 
@@ -15,6 +17,11 @@ public class Zone implements Disposable {
 	private final EmfMap map;
 	private final EmfMapRenderer mapRenderer;
 
+	// separate list, because NPC IDs and player IDs can overlap
+	private final ArrayList<PlayerCharacter> players = new ArrayList<>();
+	private final ArrayList<NonPlayerCharacter> npcs = new ArrayList<>();
+
+	// list for rendering
 	private final ArrayList<CharacterEntity> characters = new ArrayList<>();
 
 	public Zone(EmfMap map) {
@@ -22,15 +29,28 @@ public class Zone implements Disposable {
 		this.mapRenderer = new EmfMapRenderer(map, characters);
 	}
 
-	public CharacterEntity getCharacter(int playerID) {
-		for(CharacterEntity character : characters)
-			if(character.getID() == playerID)
-				return character;
+	public void addNpc(NonPlayerCharacter npc) {
+		npcs.add(npc);
+		characters.add(npc);
+	}
+
+	public void addPlayer(PlayerCharacter player) {
+		players.add(player);
+		characters.add(player);
+	}
+
+	public PlayerCharacter getPlayer(int playerID) {
+		for(PlayerCharacter player : players)
+			if(player.getPlayerID() == playerID)
+				return player;
 		return null;
 	}
 
-	public void addCharacter(CharacterEntity character) {
-		characters.add(character);
+	public NonPlayerCharacter getNPC(int index) {
+		for(NonPlayerCharacter npc : npcs)
+			if(npc.getIndex() == index)
+				return npc;
+		return null;
 	}
 
 	public boolean isBlocked(GridPoint2 position) {

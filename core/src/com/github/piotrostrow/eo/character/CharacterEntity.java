@@ -46,9 +46,16 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 	public abstract int getXOffset(int direction);
 
 	public abstract int getYOffset(int direction);
-	public abstract int getID();
 
 	protected abstract TextureRegion getTextureRegion(CharacterState characterState, int direction, int frame);
+
+	// intended for refresh packets
+	protected void setPosition(int x, int y) {
+		position.set(x, y);
+		renderingPosition.set(x, y);
+		movePositionOffset.set(0, 0);
+		characterState = CharacterState.IDLE;
+	}
 
 	public void move(int direction) {
 		renderingPosition.set(position);

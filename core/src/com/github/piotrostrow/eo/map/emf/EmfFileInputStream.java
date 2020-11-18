@@ -1,12 +1,14 @@
 package com.github.piotrostrow.eo.map.emf;
 
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 import static com.github.piotrostrow.eo.util.NumberEncoder.*;
 
 public class EmfFileInputStream extends FilterInputStream {
+
+	public EmfFileInputStream(File file) throws FileNotFoundException {
+		this(new FileInputStream(file));
+	}
 
 	public EmfFileInputStream(InputStream stream) {
 		super(stream);

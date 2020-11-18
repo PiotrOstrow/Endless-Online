@@ -146,7 +146,7 @@ public class EmfMapRenderer implements Disposable {
 				MapTile objectsOverlayLayerTile = map.objectsOverlayLayer.getTile(col, row);
 				if (objectsOverlayLayerTile != null) {
 					TextureRegion textureRegion = objectsOverlayLayerTile.getTextureRegion();
-					batch.draw(textureRegion, x + (32 - textureRegion.getRegionWidth() / 2f), y);
+					batch.draw(textureRegion, x + (32 - textureRegion.getRegionWidth() / 2), y);
 				}
 			}
 		}
@@ -166,7 +166,7 @@ public class EmfMapRenderer implements Disposable {
 				x = x - 24 + ((64f - region.getRegionWidth()) / 2);
 				y = y + 12 - ((region.getRegionHeight() - 32));
 
-				x -= 32 - (region.getRegionWidth() / 2);
+				x -= 32 - (region.getRegionWidth() / 2f);
 
 				batch.draw(region, x, y);
 			}
@@ -198,8 +198,8 @@ public class EmfMapRenderer implements Disposable {
 
 	private void prepareRender() {
 		// transforming screen coordinates to iso coordinates
-		row1 = (int) (translateScreenToIso(topLeft).y / 64) - 2;
-		row2 = (int) (translateScreenToIso(bottomRight).y / 64) + 2;
+		row1 = (int) -(translateScreenToIso(bottomRight).y / 64) - 2;
+		row2 = (int) -(translateScreenToIso(topLeft).y / 64) + 2;
 
 		col1 = (int) (translateScreenToIso(bottomLeft).x / 64) - 2;
 		col2 = (int) (translateScreenToIso(topRight).x / 64) + 2;
@@ -209,12 +209,6 @@ public class EmfMapRenderer implements Disposable {
 
 		col1 = Math.max(0, col1);
 		col2 = Math.min(map.getWidth() - 1, col2);
-
-		col1 = 0;
-		col2 = map.getWidth() - 1;
-
-		row1 = 0;
-		row2 = map.getWidth() - 1;
 	}
 
 	private Vector3 translateScreenToIso(Vector2 vec) {
@@ -231,7 +225,7 @@ public class EmfMapRenderer implements Disposable {
 		float h = height * Math.abs(camera.up.y) + width * Math.abs(camera.up.x);
 		viewBounds.set(camera.position.x - w / 2, camera.position.y - h / 2, w, h);
 
-		// setting up the screen points TODO: move this up, or remove, after rendering everything
+		// setting up the screen points
 		// COL1
 		topRight.set(viewBounds.x + viewBounds.width, viewBounds.y);
 		// COL2

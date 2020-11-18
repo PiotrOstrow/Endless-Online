@@ -1,5 +1,6 @@
 package com.github.piotrostrow.eo.net;
 
+import com.badlogic.gdx.Gdx;
 import com.github.piotrostrow.eo.net.packets.connection.ConnectionAcceptPacket;
 import com.github.piotrostrow.eo.net.packets.connection.ConnectionPlayerPacket;
 import com.github.piotrostrow.eo.net.packets.init.*;
@@ -165,7 +166,7 @@ public class Client {
 					if(shouldHandle(packet))
 						handle(packet);
 					else if (connectionListener != null)
-						connectionListener.handlePacket(packet);
+						Gdx.app.postRunnable(() -> connectionListener.handlePacket(packet)); // quick fix
 				}
 			} catch (IOException e) {
 				disconnect();

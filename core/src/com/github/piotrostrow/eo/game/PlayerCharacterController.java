@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.character.CharacterState;
 import com.github.piotrostrow.eo.character.Direction;
-import com.github.piotrostrow.eo.character.Player;
+import com.github.piotrostrow.eo.character.PlayerCharacter;
 import com.github.piotrostrow.eo.net.Packet;
 import com.github.piotrostrow.eo.net.packets.walk.FacePlayerPacket;
 import com.github.piotrostrow.eo.net.packets.walk.WalkPlayerPacket;
@@ -20,14 +20,14 @@ public class PlayerCharacterController implements InputProcessor {
 	private static final int TURN_DELAY = 250;
 
 	private final GameScreen gameScreen;
-	private final Player player;
+	private final PlayerCharacter player;
 
 	private long lastTurn;
 	private CharacterState previousFrameState = CharacterState.IDLE;
 
 	private final GridPoint2 temp = new GridPoint2();
 
-	public PlayerCharacterController(GameScreen gameScreen, Player player) {
+	public PlayerCharacterController(GameScreen gameScreen, PlayerCharacter player) {
 		this.gameScreen = gameScreen;
 		this.player = player;
 	}

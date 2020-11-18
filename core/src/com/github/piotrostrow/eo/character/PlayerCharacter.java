@@ -3,18 +3,27 @@ package com.github.piotrostrow.eo.character;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.github.piotrostrow.eo.graphics.PlayerTextureAtlas;
 import com.github.piotrostrow.eo.graphics.PlayerTextureAtlasFactory;
-import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket2;
+import com.github.piotrostrow.eo.net.structs.PlayerData;
 
-public class Player extends CharacterEntity {
+public class PlayerCharacter extends CharacterEntity {
 
 	private PlayerTextureAtlas textureAtlas;
 
-	WelcomeReplyPacket2.Character character; // temp
+	private PlayerData playerData;
 
-	public Player(WelcomeReplyPacket2.Character character) {
-		super(character.x, character.y, character.direction);
-		this.character = character;
-		this.textureAtlas = PlayerTextureAtlasFactory.create(character);
+	public PlayerCharacter(PlayerData playerData) {
+		super(playerData.x, playerData.y, playerData.direction);
+		updateData(playerData);
+	}
+
+	public void updateData(PlayerData playerData) {
+		this.playerData = playerData;
+
+		// TODO: check if there is any difference
+		this.textureAtlas = PlayerTextureAtlasFactory.create(playerData);
+
+		setDirection(playerData.direction);
+		setPosition(playerData.x, playerData.y);
 	}
 
 	@Override
@@ -32,9 +41,8 @@ public class Player extends CharacterEntity {
 		return -24;
 	}
 
-	@Override
-	public int getID() {
-		return character.playerID;
+	public int getPlayerID() {
+		return playerData.playerID;
 	}
 
 	@Override

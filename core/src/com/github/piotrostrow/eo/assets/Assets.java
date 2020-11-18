@@ -16,7 +16,9 @@ import com.github.piotrostrow.eo.map.emf.EmfMap;
 import com.github.piotrostrow.eo.map.emf.EmfMapLoader;
 import com.github.piotrostrow.eo.pe.PEFile;
 import com.github.piotrostrow.eo.pe.ResourceDataEntry;
+import com.github.piotrostrow.eo.pub.EnfFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +31,8 @@ public class Assets {
 	public static final TextureLoader.TextureParameter textureParameters;
 	private static final BitmapFontLoader.BitmapFontParameter bitmapLoaderParameters;
 
+	private static EnfFile enfFile;
+
 	static {
 		textureParameters = new TextureLoader.TextureParameter();
 		textureParameters.magFilter = Texture.TextureFilter.Nearest;
@@ -37,6 +41,12 @@ public class Assets {
 		bitmapLoaderParameters = new BitmapFontLoader.BitmapFontParameter();
 		bitmapLoaderParameters.minFilter = Texture.TextureFilter.Nearest;
 		bitmapLoaderParameters.magFilter = Texture.TextureFilter.Nearest;
+
+		try {
+			enfFile = new EnfFile(new File(Config.GAME_PATH + "/pub/dtn001.enf"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void init() {
@@ -44,6 +54,10 @@ public class Assets {
 
 		// emf map loader
 		assetManager.setLoader(EmfMap.class, new EmfMapLoader());
+	}
+
+	public static EnfFile.Npc getNpcData(int id) {
+		return enfFile.getNpcData(id);
 	}
 
 	private static void loadTextures() {

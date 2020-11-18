@@ -4,11 +4,11 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.github.piotrostrow.eo.assets.Assets;
 import com.github.piotrostrow.eo.net.packets.login.LoginReplyPacket;
 import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket2;
+import com.github.piotrostrow.eo.net.structs.PlayerData;
 import com.github.piotrostrow.eo.shaders.GfxShader;
 
 import java.util.LinkedList;
@@ -20,8 +20,8 @@ public class PlayerTextureAtlasFactory {
 		return create(character.race, character.gender, character.hairstyle, character.haircolor, character.armor, character.boots);
 	}
 
-	public static PlayerTextureAtlas create(WelcomeReplyPacket2.Character character) {
-		return create(character.race, character.gender, character.hairstyle, character.haircolor, character.armor, character.boots);
+	public static PlayerTextureAtlas create(PlayerData playerData) {
+		return create(playerData.race, playerData.gender, playerData.hairstyle, playerData.haircolor, playerData.armor, playerData.boots);
 	}
 
 	public static PlayerTextureAtlas create(int race, int gender, int hairstyle, int haircolor, int armor, int boots) {
