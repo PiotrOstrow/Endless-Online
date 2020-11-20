@@ -50,6 +50,16 @@ public class PacketHandler implements ConnectionListener {
 					int direction = packet.readEncodedByte();
 					npc.move(direction, x, y);
 					break;
+				case 1: // attack
+					int isAlive = packet.readEncodedByte();
+					direction = packet.readEncodedByte();
+					int targetPlayerID = packet.readEncodedShort();
+					int amount = packet.readEncodedThreeByteInt();
+					int targetHealthPrc = packet.readEncodedThreeByteInt();
+
+					npc.setDirection(direction);
+					npc.attack();
+					break;
 			}
 		}
 	}
@@ -110,6 +120,15 @@ public class PacketHandler implements ConnectionListener {
 				npc.updateData(npcData);
 			else
 				game.getZone().addNpc(new NonPlayerCharacter(npcData));
+		} else if(packet.equals(PacketFamily.PACKET_ATTACK, PacketAction.PACKET_PLAYER)) {
+			int playerID = packet.readEncodedShort();
+			int direction = packet.readEncodedByte();
+
+			PlayerCharacter player = game.getZone().getPlayer(playerID);
+			if(player != null) {
+				player.setDirection(direction);
+				player.attack();
+			}
 		}
 	}
 }

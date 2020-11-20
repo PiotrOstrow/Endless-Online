@@ -11,6 +11,11 @@ import com.github.piotrostrow.eo.util.PacketTimestamp;
 public abstract class CharacterEntity implements Disposable, Comparable<CharacterEntity> {
 
 	/**
+	 * Duration of attack animation in milliseconds
+	 */
+	public static int ATTACK_SPEED = 600;
+
+	/**
 	 * Actual position of the character - the actual grid position that the character occupies
 	 */
 	protected final GridPoint2 position = new GridPoint2();
@@ -57,6 +62,11 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 		characterState = CharacterState.IDLE;
 	}
 
+	public void attack() {
+		characterState = CharacterState.ATTACK_MELEE;
+		animationTimer = 0;
+	}
+
 	public void move(int direction) {
 		renderingPosition.set(position);
 
@@ -77,10 +87,10 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 		// if character is not in a grid position that's right next to the destination, the position first has to be adjusted
 		if(position.dst2(destX, destY) > 1) {
 			switch (direction) {
-				case Direction.UP	: position.set(destX, destY + 1); break;
-				case Direction.DOWN	: position.set(destX, destY - 1); break;
-				case Direction.LEFT	: position.set(destX + 1, destY); break;
-				case Direction.RIGHT: position.set(destX - 1, destY); break;
+				case Direction.UP	: setPosition(destX, destY + 1); break;
+				case Direction.DOWN	: setPosition(destX, destY - 1); break;
+				case Direction.LEFT	: setPosition(destX + 1, destY); break;
+				case Direction.RIGHT: setPosition(destX - 1, destY); break;
 			}
 		}
 
@@ -92,45 +102,64 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 		animationTimer += Gdx.graphics.getDeltaTime();
 
 		// TODO: adjust timing, so that every packet sends a timestamp with 480 delta ?
-		if(characterState == CharacterState.MOVE){
-			// one move animation takes 480 ms, having to traverse 16 pixels means 16 / 0.48 = 33.3333 pixels per second
-			float movementSpeed = 100.0f / 3f;
-			switch (direction) {
-				case Direction.UP:
-					movePositionOffset.y += movementSpeed * Gdx.graphics.getDeltaTime();
-					movePositionOffset.x += movementSpeed * Gdx.graphics.getDeltaTime() * 2;
-					break;
-				case Direction.DOWN:
-					movePositionOffset.y -= movementSpeed * Gdx.graphics.getDeltaTime();
-					movePositionOffset.x -= movementSpeed * Gdx.graphics.getDeltaTime() * 2;
-					break;
-				case Direction.LEFT:
-					movePositionOffset.x -= movementSpeed * Gdx.graphics.getDeltaTime() * 2;
-					movePositionOffset.y += movementSpeed * Gdx.graphics.getDeltaTime();
-					break;
-				case Direction.RIGHT:
-					movePositionOffset.x += movementSpeed * Gdx.graphics.getDeltaTime() * 2;
-					movePositionOffset.y -= movementSpeed * Gdx.graphics.getDeltaTime();
-					break;
-			}
+		switch(characterState){
+			case MOVE:
+				// one move animation takes 480 ms, having to traverse 16 pixels means 16 / 0.48 = 33.3333 pixels per second
+				float movementSpeed = 100.0f / 3f;
+				switch (direction) {
+					case Direction.UP:
+						movePositionOffset.y += movementSpeed * Gdx.graphics.getDeltaTime();
+						movePositionOffset.x += movementSpeed * Gdx.graphics.getDeltaTime() * 2;
+						break;
+					case Direction.DOWN:
+						movePositionOffset.y -= movementSpeed * Gdx.graphics.getDeltaTime();
+						movePositionOffset.x -= movementSpeed * Gdx.graphics.getDeltaTime() * 2;
+						break;
+					case Direction.LEFT:
+						movePositionOffset.x -= movementSpeed * Gdx.graphics.getDeltaTime() * 2;
+						movePositionOffset.y += movementSpeed * Gdx.graphics.getDeltaTime();
+						break;
+					case Direction.RIGHT:
+						movePositionOffset.x += movementSpeed * Gdx.graphics.getDeltaTime() * 2;
+						movePositionOffset.y -= movementSpeed * Gdx.graphics.getDeltaTime();
+						break;
+				}
 
-			if(Math.abs(movePositionOffset.x) >= 32.0f) {
-				characterState = CharacterState.IDLE;
-				movePositionOffset.set(0, 0);
-				renderingPosition.set(position);
-			}
+				if(Math.abs(movePositionOffset.x) >= 32.0f) {
+					characterState = CharacterState.IDLE;
+					movePositionOffset.set(0, 0);
+					renderingPosition.set(position);
+				}
+				break;
+			case ATTACK_MELEE:
+			case ATTACK_RANGE:
+				if(animationTimer * 1000 >= ATTACK_SPEED)
+					characterState = CharacterState.IDLE;
+
+				break;
 		}
 	}
 
 	public final void render(SpriteBatch batch, float x, float y){
-		int frame = 0;
+		TextureRegion textureRegion;
 		switch(characterState) {
 			case MOVE:
-				frame = (int) (Math.abs(movePositionOffset.x) / 32 * 4);
+				textureRegion = getTextureRegion(CharacterState.MOVE, direction, (int) (Math.abs(movePositionOffset.x) / 32 * 4));
+				break;
+			case ATTACK_MELEE:
+			case ATTACK_RANGE:
+				float oneFourth = ATTACK_SPEED / 4000f;
+				if(animationTimer > oneFourth * 3)
+					textureRegion = getTextureRegion(CharacterState.IDLE, direction, 0);
+				else if(animationTimer > oneFourth)
+					textureRegion = getTextureRegion(characterState, direction, 1);
+				else
+					textureRegion = getTextureRegion(characterState, direction, 0);
+				break;
+			default:
+				textureRegion = getTextureRegion(CharacterState.IDLE, direction, 0);
 				break;
 		}
-
-		TextureRegion textureRegion = getTextureRegion(characterState, direction, frame);
 
 		float xOffset = getXOffset(direction) + (32 - textureRegion.getRegionWidth() / 2f);
 		float yOffset = getYOffset(direction);

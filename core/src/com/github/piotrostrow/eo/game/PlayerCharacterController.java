@@ -9,13 +9,14 @@ import com.github.piotrostrow.eo.character.CharacterState;
 import com.github.piotrostrow.eo.character.Direction;
 import com.github.piotrostrow.eo.character.PlayerCharacter;
 import com.github.piotrostrow.eo.net.Packet;
+import com.github.piotrostrow.eo.net.packets.walk.AttackUsePacket;
 import com.github.piotrostrow.eo.net.packets.walk.FacePlayerPacket;
 import com.github.piotrostrow.eo.net.packets.walk.WalkPlayerPacket;
 
 public class PlayerCharacterController implements InputProcessor {
 
 	/**
-	 * The minimum time between turns in ms, may need adjusting
+	 * The minimum time between turns in ms, may need adjusting, cannot exceed 480
 	 */
 	private static final int TURN_DELAY = 250;
 
@@ -33,18 +34,23 @@ public class PlayerCharacterController implements InputProcessor {
 	}
 
 	public void update() {
-		if(Gdx.input.isKeyPressed(Input.Keys.W)) move(Direction.UP);
-		if(Gdx.input.isKeyPressed(Input.Keys.S)) move(Direction.DOWN);
-		if(Gdx.input.isKeyPressed(Input.Keys.A)) move(Direction.LEFT);
-		if(Gdx.input.isKeyPressed(Input.Keys.D)) move(Direction.RIGHT);
+		if(player.getCharacterState() == CharacterState.IDLE) {
+			if		(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) attack();
+			else if (Gdx.input.isKeyPressed(Input.Keys.W)) move(Direction.UP);
+			else if (Gdx.input.isKeyPressed(Input.Keys.S)) move(Direction.DOWN);
+			else if (Gdx.input.isKeyPressed(Input.Keys.A)) move(Direction.LEFT);
+			else if (Gdx.input.isKeyPressed(Input.Keys.D)) move(Direction.RIGHT);
+		}
 
 		previousFrameState = player.getCharacterState();
 	}
 
-	private void move(int direction) {
-		if(player.getCharacterState() != CharacterState.IDLE)
-			return;
+	private void attack() {
+		player.attack();
+		Main.client.sendEncodedPacket(new AttackUsePacket(player.getDirection()));
+	}
 
+	private void move(int direction) {
 		if(lastTurn + TURN_DELAY > System.currentTimeMillis())
 			return;
 

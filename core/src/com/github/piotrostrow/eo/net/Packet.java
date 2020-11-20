@@ -1,5 +1,7 @@
 package com.github.piotrostrow.eo.net;
 
+import com.github.piotrostrow.eo.util.NumberEncoder;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
@@ -67,6 +69,10 @@ public class Packet {
 
 	public int readEncodedShort(int position) {
 		return decodeNumber(buffer.get(position), buffer.get(position + 1), 254, 254) & 0xFFFF;
+	}
+
+	public int readEncodedThreeByteInt() {
+		return NumberEncoder.decodeNumber(buffer.get(), buffer.get(), buffer.get(), 254);
 	}
 
 	public int readEncodedInt() {

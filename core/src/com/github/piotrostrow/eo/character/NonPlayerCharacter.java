@@ -23,8 +23,8 @@ public class NonPlayerCharacter extends CharacterEntity{
 	public void updateData(NpcData npcData) {
 		this.index = npcData.index;
 
-		setDirection(npcData.direction);
 		setPosition(npcData.x, npcData.y);
+		setDirection(npcData.direction);
 
 		if(this.enfData == null || this.enfData.npcID != npcData.id) { // in case NPCs can morph or something
 			this.enfData = Assets.getNpcData(npcData.id);
@@ -74,7 +74,7 @@ public class NonPlayerCharacter extends CharacterEntity{
 			case IDLE: return idle[direction * 2];
 			case MOVE: return move[direction * 4 + frame];
 			case ATTACK_RANGE:
-			case ATTACK_MELEE: return attack[direction * 4 + frame];
+			case ATTACK_MELEE: return attack[direction * 2 + frame];
 		}
 		return idle[direction];
 	}
