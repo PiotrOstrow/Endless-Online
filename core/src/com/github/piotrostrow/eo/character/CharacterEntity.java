@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
-import com.github.piotrostrow.eo.util.PacketTimestamp;
 
 public abstract class CharacterEntity implements Disposable, Comparable<CharacterEntity> {
 
@@ -14,6 +13,11 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 	 * Duration of attack animation in milliseconds
 	 */
 	public static int ATTACK_SPEED = 600;
+
+	/**
+	 * Duration of a single idle frame for animation NPCs that have idle animation
+	 */
+	public int IDLE_FRAME_TIME = 200;
 
 	/**
 	 * Actual position of the character - the actual grid position that the character occupies
@@ -98,7 +102,7 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 		move(direction);
 	}
 
-	public final void update(){
+	public void update(){
 		animationTimer += Gdx.graphics.getDeltaTime();
 
 		// TODO: adjust timing, so that every packet sends a timestamp with 480 delta ?
@@ -157,7 +161,8 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 					textureRegion = getTextureRegion(characterState, direction, 0);
 				break;
 			default:
-				textureRegion = getTextureRegion(CharacterState.IDLE, direction, 0);
+				int frame = (int) (animationTimer * 1000f / IDLE_FRAME_TIME)  % 2;
+				textureRegion = getTextureRegion(CharacterState.IDLE, direction, frame);
 				break;
 		}
 

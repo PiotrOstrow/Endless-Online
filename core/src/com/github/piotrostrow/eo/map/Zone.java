@@ -1,7 +1,5 @@
 package com.github.piotrostrow.eo.map;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.piotrostrow.eo.character.CharacterEntity;
@@ -54,13 +52,17 @@ public class Zone implements Disposable {
 	}
 
 	public boolean isBlocked(GridPoint2 position) {
-		if(position.x < 0 || position.y < 0 || position.x > map.getWidth() || position.y > map.getHeight())
+		return isBlocked(position.x, position.y);
+	}
+
+	public boolean isBlocked(int x, int y) {
+		if(x < 0 || y < 0 || x > map.getWidth() || y > map.getHeight())
 			return true;
-		if(map.tileSpecs.blocked(position.x, position.y))
+		if(map.tileSpecs.blocked(x, y))
 			return true;
 
 		for(CharacterEntity character : characters)
-			if(character.getPosition().equals(position))
+			if(character.getPosition().x == x && character.getPosition().y == y)
 				return true;
 
 		return false;
@@ -69,12 +71,6 @@ public class Zone implements Disposable {
 	public void update(){
 		for(CharacterEntity character : characters)
 			character.update();
-
-		//debugging
-		if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-			mapRenderer.camera.position.add(-Gdx.input.getDeltaX(), Gdx.input.getDeltaY(), 0);
-			mapRenderer.camera.update();
-		}
 	}
 
 	public void render() {

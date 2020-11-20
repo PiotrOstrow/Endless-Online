@@ -57,7 +57,12 @@ public class Assets {
 	}
 
 	public static EnfFile.Npc getNpcData(int id) {
-		return enfFile.getNpcData(id);
+		EnfFile.Npc npcData =  enfFile.getNpcData(id);
+
+		if(!npcData.isInitialized())
+			npcData.initialize();
+
+		return npcData;
 	}
 
 	private static void loadTextures() {

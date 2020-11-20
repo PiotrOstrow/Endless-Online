@@ -1,9 +1,13 @@
 package com.github.piotrostrow.eo.pub;
 
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.github.piotrostrow.eo.assets.Assets;
 import com.github.piotrostrow.eo.map.emf.EmfFileInputStream;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public class EnfFile {
 
@@ -51,6 +55,10 @@ public class EnfFile {
 
 		public final int[] unknowns = new int[6];
 
+		private boolean hasIdleAnimation = false;
+
+		private boolean initialized;
+
 		public Npc(EmfFileInputStream stream, int npcID) throws IOException {
 			this.npcID = npcID;
 			name = stream.readString();
@@ -74,6 +82,37 @@ public class EnfFile {
 			elementWeakPower= stream.readUnsignedShort();
 			unknowns[5] = stream.read();
 			xp = stream.threeByteInt();
+		}
+
+		public void initialize() {
+			if(isInitialized())
+				throw new IllegalStateException("Already initialized");
+
+			Texture texture = Assets.gfx(21, gfxID + 1);
+
+			if (!texture.getTextureData().isPrepared())
+				texture.getTextureData().prepare();
+
+			Pixmap pixmap = texture.getTextureData().consumePixmap();
+
+			ByteBuffer buffer = pixmap.getPixels();
+			while(buffer.hasRemaining()) {
+				if (buffer.get() != 0) {
+					hasIdleAnimation = true;
+					break;
+				}
+			}
+
+			pixmap.dispose();
+			initialized = true;
+		}
+
+		public boolean hasIdleAnimation() {
+			return hasIdleAnimation;
+		}
+
+		public boolean isInitialized() {
+			return initialized;
 		}
 	}
 }

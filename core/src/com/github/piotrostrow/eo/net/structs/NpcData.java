@@ -16,4 +16,12 @@ public class NpcData {
 		this.y = packet.readEncodedByte();
 		this.direction = packet.readEncodedByte();
 	}
+
+	public NpcData(int index, int id, int x, int y, int direction) {
+		this.index = index;
+		this.id = id;
+		this.x = x;
+		this.y = y;
+		this.direction = direction;
+	}
 }

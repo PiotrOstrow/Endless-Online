@@ -36,6 +36,10 @@ public class NonPlayerCharacter extends CharacterEntity{
 			for(int i = 0; i < 8; i++)
 				move[i] = new TextureRegion(Assets.gfx(21, enfData.gfxID + i + 4));
 
+			if(!enfData.hasIdleAnimation())
+				for(int i = 0; i < idle.length; i+= 2)
+					idle[i + 1] = idle[i];
+
 			setMirrorRegions(idle);
 			setMirrorRegions(move);
 			setMirrorRegions(attack);
@@ -71,7 +75,7 @@ public class NonPlayerCharacter extends CharacterEntity{
 	@Override
 	protected TextureRegion getTextureRegion(CharacterState characterState, int direction, int frame) {
 		switch(characterState) {
-			case IDLE: return idle[direction * 2];
+			case IDLE: return idle[direction * 2 + frame];
 			case MOVE: return move[direction * 4 + frame];
 			case ATTACK_RANGE:
 			case ATTACK_MELEE: return attack[direction * 2 + frame];

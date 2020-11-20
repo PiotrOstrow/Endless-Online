@@ -30,6 +30,7 @@ public class EmfMap {
 	public final MapLayer ceilingLayer;
 	public final MapLayer roofLayer;
 
+	public final ArrayList<Spawner> spawners = new ArrayList<>();
 	public final ArrayList<MapChest> mapChests;
 	public final TileSpecs tileSpecs;
 	public final ArrayList<Warp> warps;
@@ -68,7 +69,9 @@ public class EmfMap {
 
 		//npc count
 		int npcCount = stream.readUnsignedByte();
-		stream.skip(npcCount * 8);
+		for(int i = 0; i < npcCount; i++) {
+			spawners.add(new Spawner(stream));
+		}
 
 		int unknownCount = stream.readUnsignedByte();
 		stream.skip(unknownCount * 4);
