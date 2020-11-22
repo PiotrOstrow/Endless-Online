@@ -20,6 +20,8 @@ public class PlayerCharacterController implements InputProcessor {
 	 */
 	private static final int TURN_DELAY = 250;
 
+	private boolean lock = false;
+
 	private final GameScreen gameScreen;
 	private final PlayerCharacter player;
 
@@ -34,12 +36,14 @@ public class PlayerCharacterController implements InputProcessor {
 	}
 
 	public void update() {
-		if(player.getCharacterState() == CharacterState.IDLE) {
-			if		(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) attack();
-			else if (Gdx.input.isKeyPressed(Input.Keys.W)) move(Direction.UP);
-			else if (Gdx.input.isKeyPressed(Input.Keys.S)) move(Direction.DOWN);
-			else if (Gdx.input.isKeyPressed(Input.Keys.A)) move(Direction.LEFT);
-			else if (Gdx.input.isKeyPressed(Input.Keys.D)) move(Direction.RIGHT);
+		if(!lock) {
+			if (player.getCharacterState() == CharacterState.IDLE) {
+				if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) attack();
+				else if (Gdx.input.isKeyPressed(Input.Keys.W)) move(Direction.UP);
+				else if (Gdx.input.isKeyPressed(Input.Keys.S)) move(Direction.DOWN);
+				else if (Gdx.input.isKeyPressed(Input.Keys.A)) move(Direction.LEFT);
+				else if (Gdx.input.isKeyPressed(Input.Keys.D)) move(Direction.RIGHT);
+			}
 		}
 
 		previousFrameState = player.getCharacterState();
@@ -118,5 +122,9 @@ public class PlayerCharacterController implements InputProcessor {
 	@Override
 	public boolean scrolled(int amount) {
 		return false;
+	}
+
+	public void lock(boolean lock) {
+		this.lock = lock;
 	}
 }

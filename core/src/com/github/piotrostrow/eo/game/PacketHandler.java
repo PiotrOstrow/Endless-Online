@@ -2,14 +2,18 @@ package com.github.piotrostrow.eo.game;
 
 import com.badlogic.gdx.Gdx;
 import com.github.piotrostrow.eo.Main;
+import com.github.piotrostrow.eo.assets.Assets;
 import com.github.piotrostrow.eo.character.CharacterEntity;
 import com.github.piotrostrow.eo.character.NonPlayerCharacter;
 import com.github.piotrostrow.eo.character.PlayerCharacter;
 import com.github.piotrostrow.eo.mainmenu.MainMenuScreen;
+import com.github.piotrostrow.eo.map.Zone;
+import com.github.piotrostrow.eo.map.emf.Warp;
 import com.github.piotrostrow.eo.net.ConnectionListener;
 import com.github.piotrostrow.eo.net.Packet;
 import com.github.piotrostrow.eo.net.PacketAction;
 import com.github.piotrostrow.eo.net.PacketFamily;
+import com.github.piotrostrow.eo.net.packets.warp.WarpAcceptPacket;
 import com.github.piotrostrow.eo.net.structs.NpcData;
 import com.github.piotrostrow.eo.net.structs.PlayerData;
 
@@ -129,6 +133,22 @@ public class PacketHandler implements ConnectionListener {
 				player.setDirection(direction);
 				player.attack();
 			}
+		} else if(packet.equals(PacketFamily.PACKET_WARP, PacketAction.PACKET_REQUEST)) {
+			game.getCharacterController().lock(true);
+			int warpType = packet.readEncodedByte();
+			int mapID = 0;
+			mapID = packet.readEncodedShort();
+			if (warpType == 1) { // same map
+				// TODO: map gets disposed of here too, maybe reuse zone object?
+				int x = packet.readEncodedByte();
+				int y = packet.readEncodedByte();
+			} else {
+				// TODO: check if map up to date
+			}
+			Packet response = new WarpAcceptPacket(mapID);
+			Main.client.sendEncodedPacket(response);
+		} else if(packet.equals(PacketFamily.PACKET_WARP, PacketAction.PACKET_AGREE)) {
+			game.warpAgree(packet);
 		}
 	}
 }

@@ -37,6 +37,11 @@ public class Zone implements Disposable {
 		characters.add(player);
 	}
 
+	public void removePlayer(PlayerCharacter playerCharacter){
+		players.remove(playerCharacter);
+		characters.remove(playerCharacter);
+	}
+
 	public PlayerCharacter getPlayer(int playerID) {
 		for(PlayerCharacter player : players)
 			if(player.getPlayerID() == playerID)
@@ -56,8 +61,6 @@ public class Zone implements Disposable {
 	}
 
 	public boolean isBlocked(int x, int y) {
-		if(x < 0 || y < 0 || x > map.getWidth() || y > map.getHeight())
-			return true;
 		if(map.tileSpecs.blocked(x, y))
 			return true;
 
@@ -84,5 +87,7 @@ public class Zone implements Disposable {
 	@Override
 	public void dispose() {
 		mapRenderer.dispose();
+		for(CharacterEntity character : characters)
+			character.dispose();
 	}
 }

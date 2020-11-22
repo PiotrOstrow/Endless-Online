@@ -34,6 +34,8 @@ public class TileSpecs {
 	}
 
 	public boolean blocked(int x, int y){
+		if(x < 0 || y < 0 || x > specs.length || y > specs[0].length)
+			return true;
 		switch(specs[x][y]) {
 			case 1: //Wall
 			case 2: //ChairDown
