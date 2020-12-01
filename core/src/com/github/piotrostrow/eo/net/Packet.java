@@ -5,7 +5,8 @@ import com.github.piotrostrow.eo.util.NumberEncoder;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
-import static com.github.piotrostrow.eo.util.NumberEncoder.*;
+import static com.github.piotrostrow.eo.util.NumberEncoder.decodeNumber;
+import static com.github.piotrostrow.eo.util.NumberEncoder.encodeNumber;
 
 public class Packet {
 
@@ -55,6 +56,17 @@ public class Packet {
 		return buffer.get() & 0xFF;
 	}
 
+	/**
+	 * Returns true and skips the byte if it's value is equal to 0xFF, list of structs are often marked with 0xFF at the end
+	 */
+	public boolean peekAndSkipUnencodedByte() {
+		if((buffer.get(buffer.position()) & 0xFF) == 0xFF) {
+			skip(1);
+			return true;
+		}
+		return false;
+	}
+
 	public int readEncodedByte() {
 		return decodeNumber(buffer.get(), 254, 254, 254) & 0xFF;
 	}
@@ -65,6 +77,10 @@ public class Packet {
 
 	public int readEncodedShort() {
 		return decodeNumber(buffer.get(), buffer.get(), 254, 254) & 0xFFFF;
+	}
+
+	public int readUnencodedShort() {
+		return buffer.getShort() & 0xFFFF;
 	}
 
 	public int readEncodedShort(int position) {
@@ -154,6 +170,10 @@ public class Packet {
 
 	byte[] getBytes() {
 		return buffer.array();
+	}
+
+	public int hash() {
+		return ((buffer.get(0) << 8) | buffer.get(1)) & 0xFFFF;
 	}
 
 	public boolean equals(byte packetFamily, byte packetAction) {

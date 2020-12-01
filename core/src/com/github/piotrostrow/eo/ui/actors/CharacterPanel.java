@@ -16,7 +16,7 @@ import com.github.piotrostrow.eo.character.CharacterState;
 import com.github.piotrostrow.eo.character.Direction;
 import com.github.piotrostrow.eo.graphics.PlayerTextureAtlas;
 import com.github.piotrostrow.eo.graphics.PlayerTextureAtlasFactory;
-import com.github.piotrostrow.eo.net.packets.login.LoginReplyPacket;
+import com.github.piotrostrow.eo.net.structs.LoginScreenCharacterData;
 
 /**
  * Character panel in CharacterSelectStage
@@ -28,7 +28,7 @@ public class CharacterPanel extends WidgetGroup implements Disposable {
 	public final Button deleteButton;
 	private final Label nameLabel;
 
-	private LoginReplyPacket.Character characterData;
+	private LoginScreenCharacterData characterData;
 
 	private PlayerTextureAtlas playerTextureAtlas;
 
@@ -91,7 +91,7 @@ public class CharacterPanel extends WidgetGroup implements Disposable {
 		characterData = null;
 	}
 
-	public void setCharacter(LoginReplyPacket.Character characterData) {
+	public void setCharacter(LoginScreenCharacterData characterData) {
 		this.characterData = characterData;
 		setNameLabel(characterData.name);
 

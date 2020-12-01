@@ -9,8 +9,8 @@ import com.github.piotrostrow.eo.character.NonPlayerCharacter;
 import com.github.piotrostrow.eo.character.PlayerCharacter;
 import com.github.piotrostrow.eo.map.Zone;
 import com.github.piotrostrow.eo.net.Packet;
-import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket1;
-import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket2;
+import com.github.piotrostrow.eo.net.PacketAction;
+import com.github.piotrostrow.eo.net.PacketFamily;
 import com.github.piotrostrow.eo.net.structs.NpcData;
 import com.github.piotrostrow.eo.net.structs.PlayerData;
 
@@ -20,32 +20,21 @@ public class GameScreen implements Screen {
 
 	private PlayerCharacter player;
 
-	private PlayerCharacterController characterController;
+	private final PlayerCharacterController characterController;
 
-	public GameScreen(WelcomeReplyPacket1 welcomeReplyPacket1, WelcomeReplyPacket2 welcomeReplyPacket2) {
-		Main.client.setConnectionListener(new PacketHandler(this));
+	public GameScreen(Zone zone, PlayerCharacter player) {
+		this.currentZone = zone;
+		this.player = player;
 
-		currentZone = new Zone(Assets.getMap(welcomeReplyPacket1.getMapID()));
-
-		for(PlayerData character : welcomeReplyPacket2.characters){
-			PlayerCharacter characterEntity = new PlayerCharacter(character);
-			currentZone.addPlayer(characterEntity);
-
-			if(character.playerID == welcomeReplyPacket1.getPlayerID())
-				this.player = characterEntity;
-		}
-
-		for(NpcData npcData : welcomeReplyPacket2.npcs) {
-			NonPlayerCharacter npc = new NonPlayerCharacter(npcData);
-			currentZone.addNpc(npc);
-		}
+		Main.client.setConnectionListener(new GamePacketHandler(this));
+		Main.client.registerPacketHandler(PacketFamily.PACKET_WARP, PacketAction.PACKET_AGREE, this::handleWarpAgreePacket);
 
 		// TODO: use input multiplexer when ui is implemented
 		characterController = new PlayerCharacterController(this, player);
 		Gdx.input.setInputProcessor(characterController);
 	}
 
-	protected void warpAgree(Packet packet) {
+	protected void handleWarpAgreePacket(Packet packet) {
 		int hardcodedByte = packet.readEncodedByte();
 		int mapID = packet.readEncodedShort();
 		int animation = packet.readEncodedByte();
@@ -70,8 +59,7 @@ public class GameScreen implements Screen {
 			}
 		}
 
-		while (packet.readUnencodedByte() != 0xFF) {
-			packet.skip(-1);
+		while (!packet.peekAndSkipUnencodedByte()) {
 			NpcData npcData = new NpcData(packet);
 			zone.addNpc(new NonPlayerCharacter(npcData));
 		}

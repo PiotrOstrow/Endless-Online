@@ -9,14 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.assets.Assets;
 import com.github.piotrostrow.eo.net.Packet;
-import com.github.piotrostrow.eo.net.packets.login.LoginReplyPacket;
 import com.github.piotrostrow.eo.net.packets.login.WelcomeRequestPacket;
+import com.github.piotrostrow.eo.net.structs.LoginScreenCharacterData;
 import com.github.piotrostrow.eo.shaders.GfxShader;
 import com.github.piotrostrow.eo.ui.actors.CharacterPanel;
 
@@ -119,11 +117,11 @@ public class CharacterSelectStage extends Stage {
 	}
 
 	// TODO: temporary
-	public void setCharacters(LoginReplyPacket loginReplyPacket) {
+	public void setCharacters(LoginScreenCharacterData[] characters) {
 		for(CharacterPanel characterPanel : characterPanels)
 			characterPanel.reset();
 
-		LoginReplyPacket.Character[] characters = loginReplyPacket.getCharacters();
+
 		for(int i = 0; i < characters.length && i < characterPanels.length; i++){
 			characterPanels[i].setCharacter(characters[i]);
 		}

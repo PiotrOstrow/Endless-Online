@@ -14,6 +14,8 @@ public class PacketEncoder {
 	private int sendMultiplier;
 	private int receiveMultiplier;
 
+	private boolean isInitialized = false;
+
 	private int calculateNextSequenceNumber() {
 		int sequenceStart = initialSequence;
 		sequenceIncrement = (sequenceIncrement + 1) % 10;
@@ -108,12 +110,13 @@ public class PacketEncoder {
 		this.initialSequence = (sequence1 & 0xFFFF) - (sequence2 & 0xFFFF);
 	}
 
-	public void setEncodeMultiples(byte sendMultiplier, byte receiveMultiplier) {
-		this.sendMultiplier = sendMultiplier & 0xFF;
-		this.receiveMultiplier = receiveMultiplier & 0xFF;
+	public void setEncodeMultiples(int sendMultiplier, int receiveMultiplier) {
+		this.sendMultiplier = sendMultiplier;
+		this.receiveMultiplier = receiveMultiplier;
+		this.isInitialized = true;
 	}
 
 	public boolean isInitialized() {
-		return sendMultiplier != 0 && receiveMultiplier != 0;
+		return isInitialized;
 	}
 }

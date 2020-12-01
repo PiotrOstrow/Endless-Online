@@ -6,8 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
 import com.github.piotrostrow.eo.assets.Assets;
-import com.github.piotrostrow.eo.net.packets.login.LoginReplyPacket;
-import com.github.piotrostrow.eo.net.packets.login.WelcomeReplyPacket2;
+import com.github.piotrostrow.eo.net.structs.LoginScreenCharacterData;
 import com.github.piotrostrow.eo.net.structs.PlayerData;
 import com.github.piotrostrow.eo.shaders.GfxShader;
 
@@ -16,7 +15,7 @@ import java.util.Queue;
 
 public class PlayerTextureAtlasFactory {
 
-	public static PlayerTextureAtlas create(LoginReplyPacket.Character character) {
+	public static PlayerTextureAtlas create(LoginScreenCharacterData character) {
 		return create(character.race, character.gender, character.hairstyle, character.haircolor, character.armor, character.boots);
 	}
 
