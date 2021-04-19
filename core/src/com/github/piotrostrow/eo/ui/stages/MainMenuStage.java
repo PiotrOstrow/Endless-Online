@@ -54,14 +54,19 @@ public class MainMenuStage extends Stage {
 		ClickListener clickListener = new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				if(event.getTarget() == createAccountButton) {
-					if(!Main.client.isConnected()) {
-						Main.client.connect();
-						toOpenOnConnect = registerWindow;
-					}else{
-						registerWindow.setVisible(true);
-						loginWindow.setVisible(false);
-					}
+			if(event.getTarget() == createAccountButton) {
+				if(!Main.client.isConnected()) {
+					Main.client.connect();
+					toOpenOnConnect = registerWindow;
+				}else{
+					// for hotswap TODO: remove
+						registerWindow.remove();
+						registerWindow = new RegisterWindow();
+						registerWindow.setPosition(Gdx.graphics.getWidth() - registerWindow.getWidth() - 50, 50);
+						addActor(registerWindow);
+					registerWindow.setVisible(true);
+					loginWindow.setVisible(false);
+				}
 			} else if (event.getTarget() == playButton) {
 					if(!Main.client.isConnected()) {
 						Main.client.connect();
@@ -89,6 +94,9 @@ public class MainMenuStage extends Stage {
 		addActor(loginWindow);
 
 		registerWindow = new RegisterWindow();
+		registerWindow.setPosition(Gdx.graphics.getWidth() - registerWindow.getWidth() - 50, 50);
+		registerWindow.setVisible(false);
+		addActor(registerWindow);
 	}
 
 	public void connected() {
