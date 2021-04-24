@@ -27,13 +27,14 @@ public class LoginWindow extends WidgetGroup {
 		Texture textFieldTexture = Assets.getTexture("text_field.png");
 		TextField.TextFieldStyle textFieldStyle = new TextField.TextFieldStyle();
 		textFieldStyle.background = new TextureRegionDrawable(textFieldTexture);
-		textFieldStyle.font = Assets.getFont("fonts/Arial/14.fnt");
+		textFieldStyle.font = Assets.getFont("fonts/ms_ss/14.fnt");
 		textFieldStyle.fontColor = Color.BLACK;
-		textFieldStyle.cursor = Assets.getTextCursor(textFieldStyle.font, new Color(0, 0, 1f / 255f, 1f));
-		textFieldStyle.selection = Assets.getTextCursor(textFieldStyle.font, new Color(1, 1, 1, 0.5f));
+		textFieldStyle.cursor = Assets.getTextCursor(textFieldStyle.font, Color.valueOf("#7d5321"));
+		textFieldStyle.selection = Assets.getTextSelector(textFieldStyle.font, Color.valueOf("#7d5321"));
 
 		textFieldStyle.background.setRightWidth(3);
-		textFieldStyle.background.setLeftWidth(3);
+		textFieldStyle.background.setLeftWidth(6);
+		textFieldStyle.background.setBottomHeight(1);
 
 		Texture buttonsTexture = Assets.gfx(1, 115);
 		TextureRegion[][] buttonsTR = TextureRegion.split(buttonsTexture, buttonsTexture.getWidth() / 2, buttonsTexture.getHeight() / 10);
@@ -63,8 +64,8 @@ public class LoginWindow extends WidgetGroup {
 		passwordField.setPasswordMode(true);
 		passwordField.setPasswordCharacter('*');
 
-		loginField.setPosition(140, 105);
-		passwordField.setPosition(140, 69);
+		loginField.setPosition(144, 106);
+		passwordField.setPosition(144, 70);
 
 		addActor(loginField);
 		addActor(passwordField);
@@ -93,5 +94,9 @@ public class LoginWindow extends WidgetGroup {
 		super.setVisible(visible);
 		if(visible)
 			getStage().setKeyboardFocus(loginField);
+
+		loginField.setPosition(142, 106);
+		//loginField.
+		passwordField.setPosition(142, 70);
 	}
 }

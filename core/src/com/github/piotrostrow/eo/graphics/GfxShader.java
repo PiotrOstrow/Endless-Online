@@ -1,4 +1,4 @@
-package com.github.piotrostrow.eo.shaders;
+package com.github.piotrostrow.eo.graphics;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;

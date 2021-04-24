@@ -13,11 +13,16 @@ import com.github.piotrostrow.eo.net.ConnectionListener;
 import com.github.piotrostrow.eo.net.Packet;
 import com.github.piotrostrow.eo.net.PacketAction;
 import com.github.piotrostrow.eo.net.PacketFamily;
+import com.github.piotrostrow.eo.net.constants.AccountReply;
+import com.github.piotrostrow.eo.net.constants.CharacterReply;
 import com.github.piotrostrow.eo.net.constants.LoginReply;
+import com.github.piotrostrow.eo.net.packets.account.AccountCreatePacket;
 import com.github.piotrostrow.eo.net.packets.login.WelcomeMsgPacket;
 import com.github.piotrostrow.eo.net.structs.LoginScreenCharacterData;
 import com.github.piotrostrow.eo.net.structs.NpcData;
 import com.github.piotrostrow.eo.net.structs.PlayerData;
+import com.github.piotrostrow.eo.ui.actors.Dialog;
+import com.github.piotrostrow.eo.ui.actors.RegisterWindow;
 import com.github.piotrostrow.eo.ui.stages.CharacterSelectStage;
 import com.github.piotrostrow.eo.ui.stages.MainMenuStage;
 
@@ -40,8 +45,6 @@ public class MainMenuScreen implements Screen, ConnectionListener {
 		characterSelectStage = new CharacterSelectStage();
 
 		Main.client.setConnectionListener(this);
-		Main.client.registerPacketHandler(PacketFamily.PACKET_LOGIN, PacketAction.PACKET_REPLY, this::handleLoginReplyPacket);
-		Main.client.registerPacketHandler(PacketFamily.PACKET_WELCOME, PacketAction.PACKET_REPLY, this::handleWelcomeReplyPacket);
 
 		setStage(mainMenuStage);
 	}
@@ -49,12 +52,85 @@ public class MainMenuScreen implements Screen, ConnectionListener {
 	@Override
 	public void onConnect() {
 		mainMenuStage.connected();
+		Main.client.registerPacketHandler(PacketFamily.PACKET_LOGIN, PacketAction.PACKET_REPLY, this::handleLoginReplyPacket);
+		Main.client.registerPacketHandler(PacketFamily.PACKET_WELCOME, PacketAction.PACKET_REPLY, this::handleWelcomeReplyPacket);
+		Main.client.registerPacketHandler(PacketFamily.PACKET_ACCOUNT, PacketAction.PACKET_REPLY, this::handleAccountReplyPacket);
+		Main.client.registerPacketHandler(PacketFamily.PACKET_CHARACTER, PacketAction.PACKET_REPLY, this::handleCharacterReplyPacket);
 	}
 
 	@Override
 	public void onDisconnect() {
 		mainMenuStage.disconnected();
 		setStage(mainMenuStage);
+	}
+
+	private void handleCharacterReplyPacket(Packet packet) {
+		int replyCode = packet.readEncodedShort();
+		switch(replyCode) {
+			case CharacterReply.CHARACTER_OK:
+				int charCount = packet.readEncodedByte();
+				LoginScreenCharacterData[] loginScreenCharacterData = new LoginScreenCharacterData[charCount];
+
+				packet.skip(2); // hard coded 0x01FF
+
+				for(int i = 0; i < loginScreenCharacterData.length; i++)
+					loginScreenCharacterData[i] = new LoginScreenCharacterData(packet);
+
+				characterSelectStage.setCharacters(loginScreenCharacterData);
+				characterSelectStage.hideCreateCharacterWindow();
+				break;
+			default: // continue case, packet received after sending character request packet when clicking on create
+				System.err.println("Character reply code: " + replyCode);
+				break;
+		}
+	}
+
+	private void handleAccountReplyPacket(Packet packet) {
+		int accountReply = packet.readEncodedShort();
+
+		switch(accountReply) {
+			case AccountReply.ACCOUNT_EXISTS:
+				Dialog.display("Already exists", "The account name you provided already exists in our database.", currentStage);
+				break;
+			case AccountReply.ACCOUNT_NOT_APPROVED:
+				Dialog.display("Not approved", "The account name you provided is not approved, try another name.", currentStage);
+				break;
+			case AccountReply.ACCOUNT_CHANGE_FAILED:
+			case AccountReply.ACCOUNT_CHANGED:
+				// TODO: dialog
+				System.err.println("Error code: " + accountReply);
+				break;
+			case AccountReply.ACCOUNT_CREATED:
+				Dialog.display("Welcome", "Use your new account name and password to login to the game.", currentStage);
+				break;
+			// using default together with continue here because the value is uncertain (based on eoserv source)
+			case AccountReply.ACCOUNT_CONTINUE:
+			default:
+				if(packet.getSize() == 7) {
+					int seqStart = packet.readEncodedByte();
+					Main.client.getPacketEncoder().updateInitlaSequenceNumberAfterAccountReply(seqStart);
+				}
+				String reply = packet.readFixedString(2);
+				if(reply.equalsIgnoreCase("OK")) {
+
+					String title = "Account accepted";
+					String message = "Please wait a few minutes for creation.";
+					Dialog.displayWithProgressBar(title, message, 5000, currentStage, completed -> {
+						if(completed) {
+							RegisterWindow registerWindow = mainMenuStage.getRegisterWindow();
+							String username = registerWindow.getUsername();
+							String password = registerWindow.getPassword();
+							String email = registerWindow.getEmail();
+							Main.client.sendEncodedPacket(new AccountCreatePacket(username, password, email));
+
+							registerWindow.clearTextFields();
+						}
+					});
+				} else {
+					// TODO: show dialog
+				}
+				break;
+		}
 	}
 
 	private void handleLoginReplyPacket(Packet packet) {
@@ -186,5 +262,6 @@ public class MainMenuScreen implements Screen, ConnectionListener {
 	@Override
 	public void dispose() {
 		background.dispose();
+		characterSelectStage.dispose();
 	}
 }

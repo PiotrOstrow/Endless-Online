@@ -6,13 +6,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.assets.Assets;
-import com.github.piotrostrow.eo.shaders.GfxShader;
+import com.github.piotrostrow.eo.graphics.GfxShader;
 import com.github.piotrostrow.eo.ui.actors.LoginWindow;
 import com.github.piotrostrow.eo.ui.actors.RegisterWindow;
 
@@ -54,24 +55,19 @@ public class MainMenuStage extends Stage {
 		ClickListener clickListener = new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-			if(event.getTarget() == createAccountButton) {
-				if(!Main.client.isConnected()) {
-					Main.client.connect();
-					toOpenOnConnect = registerWindow;
-				}else{
-					// for hotswap TODO: remove
-						registerWindow.remove();
-						registerWindow = new RegisterWindow();
-						registerWindow.setPosition(Gdx.graphics.getWidth() - registerWindow.getWidth() - 50, 50);
-						addActor(registerWindow);
-					registerWindow.setVisible(true);
-					loginWindow.setVisible(false);
-				}
-			} else if (event.getTarget() == playButton) {
-					if(!Main.client.isConnected()) {
+				if (event.getTarget() == createAccountButton) {
+					if (!Main.client.isConnected()) {
+						Main.client.connect();
+						toOpenOnConnect = registerWindow;
+					} else {
+						registerWindow.setVisible(true);
+						loginWindow.setVisible(false);
+					}
+				} else if (event.getTarget() == playButton) {
+					if (!Main.client.isConnected()) {
 						Main.client.connect();
 						toOpenOnConnect = loginWindow;
-					}else{
+					} else {
 						loginWindow.setVisible(true);
 						registerWindow.setVisible(false);
 					}
@@ -99,8 +95,12 @@ public class MainMenuStage extends Stage {
 		addActor(registerWindow);
 	}
 
+	public RegisterWindow getRegisterWindow() {
+		return registerWindow;
+	}
+
 	public void connected() {
-		if(toOpenOnConnect != null)
+		if (toOpenOnConnect != null)
 			toOpenOnConnect.setVisible(true);
 		toOpenOnConnect = null;
 	}

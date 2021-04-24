@@ -117,11 +117,22 @@ public class Assets {
 		labelStyle.font = font;
 		labelStyle.fontColor = color;
 		Label oneCharSizeCalibrationThrowAway = new Label("|", labelStyle);
-		Pixmap cursorColor = new Pixmap(1,
-				(int) oneCharSizeCalibrationThrowAway.getHeight(),
-				Pixmap.Format.RGBA8888);
-		cursorColor.setColor(color);
-		cursorColor.fill();
-		return new TextureRegionDrawable(new Texture(cursorColor));
+		Pixmap cursorPixmap = new Pixmap(3, (int) oneCharSizeCalibrationThrowAway.getHeight(), Pixmap.Format.RGBA8888);
+		cursorPixmap.setColor(color);
+		cursorPixmap.fill();
+		cursorPixmap.setColor(0, 0, 0, 1);
+		cursorPixmap.drawLine(0, 0, 0, cursorPixmap.getHeight());
+		return new TextureRegionDrawable(new Texture(cursorPixmap));
+	}
+
+	public static Drawable getTextSelector(BitmapFont font, Color color) {
+		Label.LabelStyle labelStyle = new Label.LabelStyle();
+		labelStyle.font = font;
+		labelStyle.fontColor = color;
+		Label oneCharSizeCalibrationThrowAway = new Label("|", labelStyle);
+		Pixmap cursorPixmap = new Pixmap(1, (int) oneCharSizeCalibrationThrowAway.getHeight(), Pixmap.Format.RGBA8888);
+		cursorPixmap.setColor(color);
+		cursorPixmap.fill();
+		return new TextureRegionDrawable(new Texture(cursorPixmap));
 	}
 }

@@ -6,31 +6,37 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.assets.Assets;
+import com.github.piotrostrow.eo.graphics.GfxShader;
 import com.github.piotrostrow.eo.net.Packet;
+import com.github.piotrostrow.eo.net.PacketAction;
+import com.github.piotrostrow.eo.net.PacketFamily;
 import com.github.piotrostrow.eo.net.packets.login.WelcomeRequestPacket;
 import com.github.piotrostrow.eo.net.structs.LoginScreenCharacterData;
-import com.github.piotrostrow.eo.shaders.GfxShader;
 import com.github.piotrostrow.eo.ui.actors.CharacterPanel;
+import com.github.piotrostrow.eo.ui.actors.CreateCharacterWindow;
 
 public class CharacterSelectStage extends Stage {
 
 	private CharacterPanel[] characterPanels = new CharacterPanel[3];
 	public final Button createButton, cancelButton;
 
-//	private CreateCharacterWindow createCharacterWindow;
-	private WidgetGroup ccwContainer;
+	private final CreateCharacterWindow createCharacterWindow;
 
 	private final Table table; // container
 
 	public CharacterSelectStage(){
 		super(new ScreenViewport());
 		getBatch().setShader(new GfxShader());
+
+		createCharacterWindow = new CreateCharacterWindow();
 
 		Texture characterPanelTexture = Assets.gfx(1, 111);
 		Texture buttons1 = Assets.gfx(1, 114);
@@ -94,8 +100,9 @@ public class CharacterSelectStage extends Stage {
 			public void clicked(InputEvent event, float x, float y) {
 				if(event.getTarget() == cancelButton) {
 					Main.client.disconnect();
-				} else {
-					//TODO: create dialog
+				} else if(event.getTarget() == createButton) {
+					addActor(createCharacterWindow);
+					Main.client.sendEncodedPacket(new Packet(PacketFamily.PACKET_CHARACTER, PacketAction.PACKET_REQUEST));
 				}
 			}
 		};
@@ -110,9 +117,6 @@ public class CharacterSelectStage extends Stage {
 
 		table.setY(50 + createButton.getHeight() + 10);
 
-		ccwContainer = new WidgetGroup();
-		ccwContainer.setVisible(false);
-
 		setActorPositions();
 	}
 
@@ -120,7 +124,6 @@ public class CharacterSelectStage extends Stage {
 	public void setCharacters(LoginScreenCharacterData[] characters) {
 		for(CharacterPanel characterPanel : characterPanels)
 			characterPanel.reset();
-
 
 		for(int i = 0; i < characters.length && i < characterPanels.length; i++){
 			characterPanels[i].setCharacter(characters[i]);
@@ -132,8 +135,6 @@ public class CharacterSelectStage extends Stage {
 
 		createButton.setPosition(table.getX(), 50);
 		cancelButton.setPosition(table.getX() + createButton.getWidth(), 50);
-
-		ccwContainer.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
 
 	public void resized(int width, int height) {
@@ -142,13 +143,14 @@ public class CharacterSelectStage extends Stage {
 	}
 
 	public void hideCreateCharacterWindow(){
-		ccwContainer.setVisible(false);
+		createCharacterWindow.remove();
 	}
 
 	@Override
 	public void dispose() {
-		// batch was set to use a custom shader that we have to dispose
-		getBatch().getShader().dispose();
 		super.dispose();
+		createCharacterWindow.dispose();
+		for(CharacterPanel characterPanel : characterPanels)
+			characterPanel.dispose();
 	}
 }

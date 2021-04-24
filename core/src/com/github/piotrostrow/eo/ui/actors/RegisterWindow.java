@@ -10,7 +10,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.assets.Assets;
+import com.github.piotrostrow.eo.net.Packet;
+import com.github.piotrostrow.eo.net.packets.account.AccountRequestPacket;
 
 public class RegisterWindow extends WidgetGroup {
 
@@ -25,10 +28,10 @@ public class RegisterWindow extends WidgetGroup {
 		addActor(new Image(background));
 
 		TextField.TextFieldStyle textFieldStyle = new TextField.TextFieldStyle();
-		textFieldStyle.font = Assets.getFont("fonts/Arial/14.fnt");
+		textFieldStyle.font = Assets.getFont("fonts/ms_ss/14.fnt");
 		textFieldStyle.fontColor = Color.BLACK;
-		textFieldStyle.cursor = Assets.getTextCursor(textFieldStyle.font, new Color(0, 0, 1f / 255f, 1f));
-		textFieldStyle.selection = Assets.getTextCursor(textFieldStyle.font, new Color(1, 1, 1, 0.5f));
+		textFieldStyle.cursor = Assets.getTextCursor(textFieldStyle.font, Color.valueOf("#7d5321"));
+		textFieldStyle.selection = Assets.getTextSelector(textFieldStyle.font, Color.valueOf("#7d5321"));
 
 		loginField = new TextField("", textFieldStyle);
 		passwordField = new TextField("", textFieldStyle);
@@ -41,10 +44,10 @@ public class RegisterWindow extends WidgetGroup {
 		passwordField.setPasswordCharacter('*');
 		confirmPasswordField.setPasswordCharacter('*');
 
-		loginField.setPosition(174, 141);
-		passwordField.setPosition(174, 116);
-		confirmPasswordField.setPosition(174, 91);
-		emailField.setPosition(174, 66);
+		loginField.setPosition(174, 143);
+		passwordField.setPosition(174, 118);
+		confirmPasswordField.setPosition(174, 93);
+		emailField.setPosition(174, 68);
 
 		addActor(loginField);
 		addActor(passwordField);
@@ -73,7 +76,24 @@ public class RegisterWindow extends WidgetGroup {
 		okButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
+				String username = loginField.getText().trim();
+				String password = passwordField.getText().trim();
+				String email = emailField.getText().trim();
 
+				if(!confirmPasswordField.getText().equals(password)){
+					// TODO: display dialog
+					System.err.println("Passwords do not match");
+					return;
+				}
+
+				if(username.isEmpty() || password.isEmpty() || email.isEmpty()){
+					// TODO: display dialog
+					System.err.println("Empty field");
+					return;
+				}
+
+				Packet packet = new AccountRequestPacket(username);
+				Main.client.sendEncodedPacket(packet);
 			}
 		});
 
@@ -83,6 +103,18 @@ public class RegisterWindow extends WidgetGroup {
 				RegisterWindow.super.setVisible(false);
 			}
 		});
+	}
+
+	public String getUsername() {
+		return loginField.getText();
+	}
+
+	public String getPassword() {
+		return passwordField.getText();
+	}
+
+	public String getEmail() {
+		return emailField.getText();
 	}
 
 	public void clearTextFields() {

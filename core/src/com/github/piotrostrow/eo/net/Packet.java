@@ -14,18 +14,22 @@ public class Packet {
 
 	protected final ByteBuffer buffer;
 
+	boolean inbound;
+
 	/**
 	 * Constructor meant for incoming packets, where the first 2 bytes are packet action and packet family
 	 */
 	public Packet(byte[] buffer) {
 		this.buffer = ByteBuffer.wrap(buffer);
 		this.buffer.position(2); // skip packet action and packet family bytes
+		this.inbound = true;
 	}
 
-	protected Packet(byte packetFamily, byte packetAction) {
-		buffer = ByteBuffer.allocate(1024);
-		buffer.put(packetAction);
-		buffer.put(packetFamily);
+	public Packet(byte packetFamily, byte packetAction) {
+		this.buffer = ByteBuffer.allocate(1024);
+		this.buffer.put(packetAction);
+		this.buffer.put(packetFamily);
+		this.inbound = false;
 	}
 
 	/**
@@ -161,6 +165,8 @@ public class Packet {
 	}
 
 	public int getSize() {
+		if(inbound)
+			return buffer.array().length;
 		return buffer.position();
 	}
 

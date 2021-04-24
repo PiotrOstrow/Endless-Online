@@ -19,8 +19,8 @@ import com.github.piotrostrow.eo.map.emf.AnimatedMapTile;
 import com.github.piotrostrow.eo.map.emf.EmfMap;
 import com.github.piotrostrow.eo.map.emf.Spawner;
 import com.github.piotrostrow.eo.net.structs.NpcData;
-import com.github.piotrostrow.eo.shaders.BlurGfxShader;
-import com.github.piotrostrow.eo.shaders.GfxShader;
+import com.github.piotrostrow.eo.graphics.BlurGfxShader;
+import com.github.piotrostrow.eo.graphics.GfxShader;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 

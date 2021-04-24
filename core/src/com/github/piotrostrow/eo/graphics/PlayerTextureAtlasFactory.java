@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.github.piotrostrow.eo.assets.Assets;
 import com.github.piotrostrow.eo.net.structs.LoginScreenCharacterData;
 import com.github.piotrostrow.eo.net.structs.PlayerData;
-import com.github.piotrostrow.eo.shaders.GfxShader;
 
 import java.util.LinkedList;
 import java.util.Queue;

@@ -102,6 +102,10 @@ public class PacketEncoder {
 			data[i] = temp[i];
 	}
 
+	public void updateInitlaSequenceNumberAfterAccountReply(int newSequence) {
+		this.initialSequence = newSequence;
+	}
+
 	public void setInitialSequenceNumber(int sequence1, int sequence2) {
 		this.initialSequence = (sequence1 & 0xFF) * 7 - 11 + (sequence2 & 0xFF) - 2;
 	}

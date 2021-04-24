@@ -81,6 +81,10 @@ public class Client {
 		return isConnected;
 	}
 
+	public PacketEncoder getPacketEncoder() {
+		return packetEncoder;
+	}
+
 	public void sendEncodedPacket(Packet packet) {
 		byte[] encodedData = packetEncoder.encode(packet);
 

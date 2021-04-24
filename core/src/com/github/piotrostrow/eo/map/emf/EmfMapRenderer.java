@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.piotrostrow.eo.character.CharacterEntity;
-import com.github.piotrostrow.eo.shaders.GfxShader;
+import com.github.piotrostrow.eo.graphics.GfxShader;
 
 import java.util.ArrayList;
 import java.util.Collections;
