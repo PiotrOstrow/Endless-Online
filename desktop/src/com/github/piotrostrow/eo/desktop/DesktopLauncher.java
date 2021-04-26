@@ -10,7 +10,7 @@ public class DesktopLauncher {
 		Config.GAME_PATH = arg[0];
 
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.vSyncEnabled = true;
+		config.vSyncEnabled = false;
 		config.backgroundFPS = 0;
 		config.foregroundFPS = 0;
 		config.resizable = false;

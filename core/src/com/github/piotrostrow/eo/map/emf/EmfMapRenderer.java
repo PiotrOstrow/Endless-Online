@@ -1,17 +1,16 @@
 package com.github.piotrostrow.eo.map.emf;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.piotrostrow.eo.character.CharacterEntity;
-import com.github.piotrostrow.eo.graphics.GfxShader;
+import com.github.piotrostrow.eo.graphics.ZBufferSpriteBatch;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class EmfMapRenderer implements Disposable {
 
 	public final OrthographicCamera camera;
 	private final Viewport viewport;
-	private SpriteBatch batch;
+	private ZBufferSpriteBatch batch;
 
 	private final EmfMap map;
 
@@ -42,32 +41,18 @@ public class EmfMapRenderer implements Disposable {
 
 	private List<CharacterEntity> characters;
 
-	/**
-	 * Shader reference to dispose, can be null
-	 */
-	private ShaderProgram shader;
-
-	/**
-	 * Creates an instance where the shader is managed internally
-	 */
-	public EmfMapRenderer(EmfMap map) {
-		this(map, new ArrayList<>());
-	}
-
-	/**
-	 * Creates an instance where the shader is managed internally
-	 */
 	public EmfMapRenderer(EmfMap map, List<CharacterEntity> characters) {
 		this.map = map;
 		this.characters = characters;
-		this.batch = new SpriteBatch();
-		this.shader = new GfxShader();
-		this.batch.setShader(shader);
+		this.batch = new ZBufferSpriteBatch();
 
 		float width = 1280;
 		float height = 720;
 		this.viewport = new StretchViewport(width, height);
 		this.camera = new OrthographicCamera(width, height);
+		this.camera.near = -(1 << 16);
+		this.camera.far = 1 << 16;
+		this.camera.update(true);
 		this.viewport.setCamera(this.camera);
 
 		// center the camera
@@ -92,6 +77,10 @@ public class EmfMapRenderer implements Disposable {
 		batch.begin();
 
 		renderLayer(map.groundLayer);
+
+		batch.flush();
+		Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
+
 		renderShadowLayer();
 
 		renderMiddleLayers();
@@ -100,6 +89,7 @@ public class EmfMapRenderer implements Disposable {
 		renderLayer(map.roofLayer, -132, 0);
 
 		batch.end();
+		//System.out.println("Render calls: " + batch.renderCalls);
 	}
 
 	private void renderMiddleLayers() {
@@ -135,7 +125,7 @@ public class EmfMapRenderer implements Disposable {
 					CharacterEntity entity = characters.get(entityCounter);
 					GridPoint2 position = entity.getRenderingGridPosition();
 					if (position.x == col && position.y == row) {
-						entity.render(batch, x, y);
+						//entity.render(batch, x, y);
 					} else if (position.x > col || (position.x == col && position.y < row)) {
 						break;
 					}
@@ -153,7 +143,7 @@ public class EmfMapRenderer implements Disposable {
 	}
 
 	private void renderShadowLayer() {
-		batch.setColor(1, 1, 1, 0.5f);
+//		batch.setColor(1, 1, 1, 0.5f);
 		for(int col = col2; col >= col1; col--) {
 			for (int row = row2; row >= row1; row--) {
 				float x = (col * 32) - (row * 32);
@@ -171,7 +161,7 @@ public class EmfMapRenderer implements Disposable {
 				batch.draw(region, x, y);
 			}
 		}
-		batch.setColor(1, 1, 1, 1);
+//		batch.setColor(1, 1, 1, 1);
 	}
 
 	private void renderLayer(MapLayer layer) {
@@ -239,7 +229,5 @@ public class EmfMapRenderer implements Disposable {
 	@Override
 	public void dispose() {
 		batch.dispose();
-		if(shader != null)
-			shader.dispose();
 	}
 }
