@@ -106,7 +106,7 @@ public class EmfMapRenderer implements Disposable {
 		int entityCounter = 0;
 		int itemCounter = 0;
 		for (int col = col1; col <= col2; col++) {
-			for (int row = row2; row >= row1; row--) {
+			for (int row = row1; row <= row2; row++) {
 				float x = (col * 32) - (row * 32);
 				float y = -((row * 16) + (col * 16));
 
@@ -136,7 +136,7 @@ public class EmfMapRenderer implements Disposable {
 					GridPoint2 position = entity.getRenderingGridPosition();
 					if (position.x == col && position.y == row) {
 						entity.render(batch, x, y);
-					} else if (position.x > col || (position.x == col && position.y < row)) {
+					} else if (position.x > col || (position.x == col && position.y > row)) {
 						break;
 					}
 					entityCounter++;
@@ -155,7 +155,7 @@ public class EmfMapRenderer implements Disposable {
 	private void renderShadowLayer() {
 		batch.setColor(1, 1, 1, 0.5f);
 		for(int col = col2; col >= col1; col--) {
-			for (int row = row2; row >= row1; row--) {
+			for (int row = row1; row <= row2; row++) {
 				float x = (col * 32) - (row * 32);
 				float y = -((row * 16) + (col * 16));
 
@@ -180,7 +180,7 @@ public class EmfMapRenderer implements Disposable {
 
 	private void renderLayer(MapLayer layer, float xOffset, float yOffset) {
 		for(int col = col2; col >= col1; col--) {
-			for (int row = row2; row >= row1; row--) {
+			for (int row = row1; row <= row2; row++) {
 				float x = (col * 32) - (row * 32);
 				float y = -((row * 16) + (col * 16));
 

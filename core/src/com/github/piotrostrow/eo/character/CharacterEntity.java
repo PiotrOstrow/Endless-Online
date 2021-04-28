@@ -210,9 +210,9 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 			return 1;
 		} else if (p1.x == p2.x){
 			if(p1.y < p2.y) {
-				return 1;
-			} else if (p1.y > p2.y) {
 				return -1;
+			} else if (p1.y > p2.y) {
+				return 1;
 			} else if (lastMoved > o.lastMoved) {
 				return 1;
 			} else {
