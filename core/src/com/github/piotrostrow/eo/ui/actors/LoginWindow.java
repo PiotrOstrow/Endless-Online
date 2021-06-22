@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -64,24 +65,41 @@ public class LoginWindow extends WidgetGroup {
 		passwordField.setPasswordMode(true);
 		passwordField.setPasswordCharacter('*');
 
-		loginField.setPosition(144, 106);
-		passwordField.setPosition(144, 70);
+		loginField.setPosition(142, 106);
+		passwordField.setPosition(142, 70);
 
 		addActor(loginField);
 		addActor(passwordField);
 
+		loginField.addListener(new InputListener() {
+			@Override
+			public boolean keyTyped(InputEvent event, char character) {
+				if(character == '\r' || character == '\n') {
+					getStage().setKeyboardFocus(passwordField);
+					return true;
+				}
+				return false;
+			}
+		});
+
+		passwordField.addListener(new InputListener() {
+			@Override
+			public boolean keyTyped(InputEvent event, char character) {
+				if(character == '\r' || character == '\n') {
+					onLogin();
+					clearFields();
+					return true;
+				}
+				return false;
+			}
+		});
+
 		ClickListener clickListener = new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				LoginWindow.this.setVisible(false);
-				String username = loginField.getText().trim().length() == 0 ? "pepega131" : loginField.getText();
-				String password = passwordField.getText().trim().length() == 0 ? "asdasd" : passwordField.getText();
-				if(event.getTarget() == loginButton){
-					Main.client.sendEncodedPacket(new LoginPacket(username, password));
-				}
-
-				loginField.setText("");
-				passwordField.setText("");
+				if(event.getTarget() == loginButton)
+					onLogin();
+				clearFields();
 			}
 		};
 
@@ -89,14 +107,26 @@ public class LoginWindow extends WidgetGroup {
 		loginButton.addListener(clickListener);
 	}
 
+	private void onLogin() {
+		LoginWindow.this.setVisible(false);
+		getStage().setKeyboardFocus(null);
+
+		String username = loginField.getText();
+		String password = passwordField.getText();
+
+		Main.client.sendEncodedPacket(new LoginPacket(username, password));
+	}
+
+	private void clearFields() {
+		loginField.setText("");
+		passwordField.setText("");
+	}
+
 	@Override
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
+
 		if(visible)
 			getStage().setKeyboardFocus(loginField);
-
-		loginField.setPosition(142, 106);
-		//loginField.
-		passwordField.setPosition(142, 70);
 	}
 }

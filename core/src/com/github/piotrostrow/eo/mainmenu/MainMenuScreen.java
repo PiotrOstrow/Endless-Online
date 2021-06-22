@@ -152,8 +152,11 @@ public class MainMenuScreen implements Screen, ConnectionListener {
 				characterSelectStage.setCharacters(characters);
 				setStage(characterSelectStage);
 				break;
+			case LoginReply.LOGIN_WRONG_USERPASS:
+				Dialog.display("Login refused", "The account or password you provided could not be found in our database.", currentStage);
+				break;
 			default:
-				System.err.println("Login error code: " + replyCode);
+				Dialog.display("Login error", "Error code: " + replyCode, currentStage);
 				break;
 		}
 	}
