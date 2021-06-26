@@ -53,25 +53,35 @@ public class PacketEncoder {
 	}
 
 	private void flip(byte[] data) {
-		for(int i = 0; i < data.length; i++)
+		for(int i = 0; i < data.length; i++) {
 			data[i] = (byte) (data[i] ^ 0x80);
+			if(data[i] == (byte) 0x80)
+				data[i] = 0;
+			else if(data[i] == 0)
+				data[i] = (byte) 0x80;
+		}
 	}
 
 	private void swapMultiples(byte[] data, int multi){
-		for (int i = 0, n = 0; i <= data.length; ++i){
-			if (i != data.length && data[i] % multi == 0){
-				++n;
+		ByteBuffer buffer = ByteBuffer.wrap(temp);
+
+		int i;
+		for(i = 0; i < data.length; i++) {
+			if((data[i] & 0xFF) % multi == 0) {
+				buffer.put(data[i]);
 			} else {
-				if (n > 1) {
-					for (int j = 0; j < n / 2; ++j) {
-						byte temp = data[i - n + j];
-						data[i - n + j] = data[i - j - 1];
-						data[i - j - 1] = temp;
+				if(buffer.position() > 1) {
+					for(int j = 0; j < buffer.position(); j++){
+						data[i - buffer.position() + j] = buffer.get(buffer.position() - 1 - j);
 					}
 				}
-				n = 0;
+				buffer.position(0);
 			}
 		}
+
+		if(buffer.position() > 1)
+			for(int j = 0; j < buffer.position(); j++)
+				data[i - buffer.position() + j] = buffer.get(buffer.position() - 1 - j);
 	}
 
 	private void interleave(byte[] data){

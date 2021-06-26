@@ -53,6 +53,7 @@ public class Client {
 		if (!isConnected() && !isConnecting()) {
 			isConnecting = true;
 			Thread thread = new Thread(this::networkLoop);
+			thread.setDaemon(true);
 			thread.start();
 		}
 	}
@@ -124,8 +125,8 @@ public class Client {
 		int reply = packet.readUnencodedByte();
 		int seqBytes1 = packet.readUnencodedByte();
 		int seqBytes2 = packet.readUnencodedByte();
-		int sendMultiplier = packet.readUnencodedByte();
 		int recvMultiplier = packet.readUnencodedByte();
+		int sendMultiplier = packet.readUnencodedByte();
 		int clientID = packet.readUnencodedShort();
 
 		packetEncoder.setInitialSequenceNumber(seqBytes1, seqBytes2);
