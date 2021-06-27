@@ -1,6 +1,8 @@
 package com.github.piotrostrow.eo.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.github.piotrostrow.eo.Main;
@@ -22,6 +24,8 @@ public class GameScreen implements Screen {
 
 	private final PlayerCharacterController characterController;
 
+	private /*final*/ GameUI gameUI = new GameUI();
+
 	public GameScreen(Zone zone, PlayerCharacter player) {
 		this.currentZone = zone;
 		this.player = player;
@@ -31,7 +35,9 @@ public class GameScreen implements Screen {
 
 		// TODO: use input multiplexer when ui is implemented
 		characterController = new PlayerCharacterController(this, player);
-		Gdx.input.setInputProcessor(characterController);
+
+		InputMultiplexer inputMultiplexer = new InputMultiplexer(gameUI, characterController);
+		Gdx.input.setInputProcessor(inputMultiplexer);
 	}
 
 	protected void handleWarpAgreePacket(Packet packet) {
@@ -70,6 +76,10 @@ public class GameScreen implements Screen {
 	}
 
 	private void input() {
+		if(Gdx.input.isKeyJustPressed(Input.Keys.F5)) { // for hotswap
+			gameUI = new GameUI();
+			Gdx.input.setInputProcessor(new InputMultiplexer(gameUI, characterController));
+		}
 	}
 
 	private void update(){
@@ -87,8 +97,10 @@ public class GameScreen implements Screen {
 	public void render(float delta) {
 		input();
 		update();
+		gameUI.act(Gdx.graphics.getDeltaTime());
 
 		currentZone.render();
+		gameUI.draw();
 	}
 
 	protected PlayerCharacterController getCharacterController() {

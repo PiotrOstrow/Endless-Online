@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.github.piotrostrow.eo.assets.Assets;
+import com.github.piotrostrow.eo.game.GameUI;
 import com.github.piotrostrow.eo.net.Client;
 import com.github.piotrostrow.eo.mainmenu.MainMenuScreen;
 
