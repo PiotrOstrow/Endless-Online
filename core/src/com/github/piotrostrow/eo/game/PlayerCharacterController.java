@@ -28,7 +28,10 @@ public class PlayerCharacterController implements InputProcessor {
 	private long lastTurn;
 	private CharacterState previousFrameState = CharacterState.IDLE;
 
+	private boolean[] pressedKeys = new boolean[256];
+
 	private final GridPoint2 temp = new GridPoint2();
+
 
 	public PlayerCharacterController(GameScreen gameScreen, PlayerCharacter player) {
 		this.gameScreen = gameScreen;
@@ -38,11 +41,11 @@ public class PlayerCharacterController implements InputProcessor {
 	public void update() {
 		if(!lock) {
 			if (player.getCharacterState() == CharacterState.IDLE) {
-				if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) attack();
-				else if (Gdx.input.isKeyPressed(Input.Keys.W)) move(Direction.UP);
-				else if (Gdx.input.isKeyPressed(Input.Keys.S)) move(Direction.DOWN);
-				else if (Gdx.input.isKeyPressed(Input.Keys.A)) move(Direction.LEFT);
-				else if (Gdx.input.isKeyPressed(Input.Keys.D)) move(Direction.RIGHT);
+				if (pressedKeys[Input.Keys.CONTROL_LEFT] && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) attack();
+				else if (pressedKeys[Input.Keys.W] && Gdx.input.isKeyPressed(Input.Keys.W)) move(Direction.UP);
+				else if (pressedKeys[Input.Keys.S] && Gdx.input.isKeyPressed(Input.Keys.S)) move(Direction.DOWN);
+				else if (pressedKeys[Input.Keys.A] && Gdx.input.isKeyPressed(Input.Keys.A)) move(Direction.LEFT);
+				else if (pressedKeys[Input.Keys.D] && Gdx.input.isKeyPressed(Input.Keys.D)) move(Direction.RIGHT);
 			}
 		}
 
@@ -84,13 +87,13 @@ public class PlayerCharacterController implements InputProcessor {
 
 	@Override
 	public boolean keyDown(int keycode) {
-
-
+		pressedKeys[keycode] = true;
 		return false;
 	}
 
 	@Override
 	public boolean keyUp(int keycode) {
+		pressedKeys[keycode] = false;
 		return false;
 	}
 

@@ -27,6 +27,11 @@ public class PlayerCharacter extends CharacterEntity {
 	}
 
 	@Override
+	public String getName() {
+		return playerData.name;
+	}
+
+	@Override
 	protected TextureRegion getTextureRegion(CharacterState characterState, int direction, int frame) {
 		return textureAtlas.get(characterState, direction, frame);
 	}

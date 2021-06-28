@@ -58,6 +58,8 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 
 	protected abstract TextureRegion getTextureRegion(CharacterState characterState, int direction, int frame);
 
+	public abstract String getName();
+
 	// intended for refresh packets
 	protected void setPosition(int x, int y) {
 		position.set(x, y);

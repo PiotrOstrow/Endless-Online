@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.utils.Disposable;
 import com.github.piotrostrow.eo.assets.Assets;
 import com.github.piotrostrow.eo.net.structs.LoginScreenCharacterData;
 import com.github.piotrostrow.eo.net.structs.PlayerData;
@@ -12,7 +13,7 @@ import com.github.piotrostrow.eo.net.structs.PlayerData;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class PlayerTextureAtlasFactory {
+public class PlayerTextureAtlasFactory implements Disposable {
 
 	public static PlayerTextureAtlas create(LoginScreenCharacterData character) {
 		return create(character.race, character.gender, character.hairstyle, character.haircolor, character.armor, character.boots);
@@ -25,7 +26,7 @@ public class PlayerTextureAtlasFactory {
 	public static PlayerTextureAtlas create(int race, int gender, int hairstyle, int haircolor, int armor, int boots) {
 		PlayerTextureAtlasFactory factory = new PlayerTextureAtlasFactory();
 		factory.render(race, gender, hairstyle, haircolor, armor, boots);
-
+		factory.dispose();
 
 		return new PlayerTextureAtlas(factory.idle, factory.movement, factory.attack, factory.spell, factory.sitChair, factory.sitGround, factory.attackBow);
 	}
@@ -397,5 +398,10 @@ public class PlayerTextureAtlasFactory {
 		drawCharacter(aSitGround, sitGround, race, gender);
 		drawCharacter(aSitGround, sitGround, race, gender);
 		drawCharacter(aAttackBow, attackBow, race, gender);
+	}
+
+	@Override
+	public void dispose() {
+		frameBuffer.dispose();
 	}
 }

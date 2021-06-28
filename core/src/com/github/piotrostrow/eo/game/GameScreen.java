@@ -24,7 +24,7 @@ public class GameScreen implements Screen {
 
 	private final PlayerCharacterController characterController;
 
-	private /*final*/ GameUI gameUI = new GameUI();
+	private GameUI gameUI;
 
 	public GameScreen(Zone zone, PlayerCharacter player) {
 		this.currentZone = zone;
@@ -35,6 +35,8 @@ public class GameScreen implements Screen {
 
 		// TODO: use input multiplexer when ui is implemented
 		characterController = new PlayerCharacterController(this, player);
+
+		gameUI = new GameUI(this);
 
 		InputMultiplexer inputMultiplexer = new InputMultiplexer(gameUI, characterController);
 		Gdx.input.setInputProcessor(inputMultiplexer);
@@ -75,9 +77,13 @@ public class GameScreen implements Screen {
 		characterController.lock(false);
 	}
 
+	public PlayerCharacter getOwnCharacter() {
+		return player;
+	}
+
 	private void input() {
 		if(Gdx.input.isKeyJustPressed(Input.Keys.F5)) { // for hotswap
-			gameUI = new GameUI();
+			gameUI = new GameUI(this);
 			Gdx.input.setInputProcessor(new InputMultiplexer(gameUI, characterController));
 		}
 	}
@@ -136,9 +142,14 @@ public class GameScreen implements Screen {
 	public void dispose() {
 		if(currentZone != null)
 			currentZone.dispose();
+		gameUI.dispose();
 	}
 
 	Zone getZone() {
 		return currentZone;
+	}
+
+	public GameUI getGameUI() {
+		return gameUI;
 	}
 }

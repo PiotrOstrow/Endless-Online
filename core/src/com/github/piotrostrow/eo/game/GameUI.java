@@ -25,7 +25,7 @@ public class GameUI extends Stage {
 	private final Inventory inventory;
 	private final ChatWindow chatWindow;
 
-	public GameUI() {
+	public GameUI(GameScreen gameScreen) {
 		super(new ScreenViewport());
 
 		inventory = new Inventory();
@@ -34,7 +34,7 @@ public class GameUI extends Stage {
 		chatWindow = new ChatWindow();
 		addComponent(chatWindow);
 
-		chatBar = new ChatBar();
+		chatBar = new ChatBar(chatWindow, gameScreen);
 		addActor(chatBar);
 
 		Texture buttonAtlasTexture = Assets.gfx(2, 125);
@@ -83,6 +83,9 @@ public class GameUI extends Stage {
 				case Input.Keys.I:
 					showComponent(inventory);
 					break;
+				case Input.Keys.TAB:
+					showComponent(chatWindow);
+					break;
 				default: return false;
 			}
 		}
@@ -93,7 +96,7 @@ public class GameUI extends Stage {
 	private void addComponent(Actor actor) {
 		addActor(actor);
 		actor.setVisible(false);
-		actor.setPosition(Gdx.graphics.getWidth() / 2 - actor.getWidth() / 2, 32);
+		actor.setPosition(Math.round(Gdx.graphics.getWidth() / 2 - actor.getWidth() / 2), 32);
 	}
 
 	private void showComponent(Actor component) {
@@ -107,5 +110,9 @@ public class GameUI extends Stage {
 			currentComponent = component;
 		}
 
+	}
+
+	public ChatWindow getChatWindow() {
+		return chatWindow;
 	}
 }

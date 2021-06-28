@@ -12,14 +12,23 @@ import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.assets.Assets;
+import com.github.piotrostrow.eo.game.GameScreen;
+import com.github.piotrostrow.eo.net.packets.talk.TalkReportPacket;
 
 public class ChatBar extends WidgetGroup {
+
+	private final ChatWindow chatWindow;
+	private final GameScreen game;
 
 	private TextField chatTextField;
 	private Image chatTextFieldLeft, chatTextFieldRight;
 
-	public ChatBar() {
+	public ChatBar(ChatWindow chatWindow, GameScreen game) {
+		this.chatWindow = chatWindow;
+		this.game = game;
+
 		Texture chatBarTexture = Assets.gfx(2, 130);
 
 		Texture chatBarSides = Assets.gfx(2, 131);
@@ -33,9 +42,7 @@ public class ChatBar extends WidgetGroup {
 		textFieldStyle.background = new TextureRegionDrawable(new TextureRegion(chatBarTexture, chatBarTexture.getWidth(), chatBarTexture.getHeight()));
 		textFieldStyle.background.setLeftWidth(4);
 
-		chatTextField = new TextField("", textFieldStyle) {
-
-		};
+		chatTextField = new TextField("", textFieldStyle);
 		chatTextField.setWidth(chatBarTexture.getWidth());
 		chatTextField.addListener(new FocusListener() {
 			@Override
@@ -53,7 +60,7 @@ public class ChatBar extends WidgetGroup {
 		});
 
 		addActor(chatTextField);
-		chatTextField.setPosition(Gdx.graphics.getWidth() / 2 - chatTextField.getWidth() / 2, 12);
+		chatTextField.setPosition(Math.round(Gdx.graphics.getWidth() / 2 - chatTextField.getWidth() / 2), 12);
 
 		for (TextureRegion[] textureRegions : chatBarSidesTR)
 			textureRegions[0].setRegionHeight(textureRegions[0].getRegionHeight() - 3);
@@ -88,6 +95,14 @@ public class ChatBar extends WidgetGroup {
 	public void onEnterPressed() {
 		if (getStage().getKeyboardFocus() == chatTextField) {
 			getStage().setKeyboardFocus(null);
+
+			String message = chatTextField.getText().trim();
+
+			if(!message.isEmpty()) {
+				Main.client.sendEncodedPacket(new TalkReportPacket(message));
+				chatWindow.addMessage(game.getOwnCharacter().getName(), message, -1);
+			}
+
 			chatTextField.setText("");
 		} else {
 			getStage().setKeyboardFocus(chatTextField);

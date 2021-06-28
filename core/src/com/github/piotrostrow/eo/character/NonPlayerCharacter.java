@@ -82,4 +82,9 @@ public class NonPlayerCharacter extends CharacterEntity{
 		}
 		return idle[direction];
 	}
+
+	@Override
+	public String getName() {
+		return enfData.name;
+	}
 }

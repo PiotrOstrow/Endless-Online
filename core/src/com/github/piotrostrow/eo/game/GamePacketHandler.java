@@ -2,6 +2,7 @@ package com.github.piotrostrow.eo.game;
 
 import com.badlogic.gdx.Gdx;
 import com.github.piotrostrow.eo.Main;
+import com.github.piotrostrow.eo.character.CharacterEntity;
 import com.github.piotrostrow.eo.character.NonPlayerCharacter;
 import com.github.piotrostrow.eo.character.PlayerCharacter;
 import com.github.piotrostrow.eo.mainmenu.MainMenuScreen;
@@ -27,6 +28,7 @@ public class GamePacketHandler implements ConnectionListener {
 		Main.client.registerPacketHandler(PacketFamily.PACKET_APPEAR, PacketAction.PACKET_REPLY, this::handleAppearReplyPacket);
 		Main.client.registerPacketHandler(PacketFamily.PACKET_ATTACK, PacketAction.PACKET_PLAYER, this::handleAttackPlayerPacket);
 		Main.client.registerPacketHandler(PacketFamily.PACKET_WARP, PacketAction.PACKET_REQUEST, this::handleWarpRequestPacket);
+		Main.client.registerPacketHandler(PacketFamily.PACKET_TALK, PacketAction.PACKET_PLAYER, this::handleTalkPlayerPacket);
 	}
 
 	@Override
@@ -40,6 +42,18 @@ public class GamePacketHandler implements ConnectionListener {
 			game.dispose();
 			Main.instance.setScreen(new MainMenuScreen());
 		});
+	}
+
+	private void handleTalkPlayerPacket(Packet packet) {
+		int playerID = packet.readEncodedShort();
+		String message = packet.readEndString();
+
+		CharacterEntity character = game.getZone().getPlayer(playerID);
+
+		if(character != null)
+			game.getGameUI().getChatWindow().addMessage(character.getName(), message);
+		else
+			System.err.println("Cannot find player with ID " + playerID + " received in TalkPlayer packet");
 	}
 
 	private void handleNpcPlayerPacket(Packet packet) {

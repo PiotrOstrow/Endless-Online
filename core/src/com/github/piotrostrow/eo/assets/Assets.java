@@ -5,13 +5,19 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.BitmapFontLoader;
 import com.badlogic.gdx.assets.loaders.TextureLoader;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.github.piotrostrow.eo.config.Config;
+import com.github.piotrostrow.eo.graphics.CustomFrameBuffer;
+import com.github.piotrostrow.eo.graphics.GfxShader;
 import com.github.piotrostrow.eo.map.emf.EmfMap;
 import com.github.piotrostrow.eo.map.emf.EmfMapLoader;
 import com.github.piotrostrow.eo.pe.PEFile;
@@ -51,9 +57,32 @@ public class Assets {
 
 	public static void init() {
 		loadTextures();
+		processTextures();
 
 		// emf map loader
 		assetManager.setLoader(EmfMap.class, new EmfMapLoader());
+	}
+
+	private static void processTextures() {
+		Texture iconTexture = gfx(2, 132);
+		TextureRegion iconTextureRegion = new TextureRegion(iconTexture);
+		iconTextureRegion.flip(false, true);
+
+		CustomFrameBuffer customFrameBuffer = new CustomFrameBuffer(Pixmap.Format.RGBA8888, iconTexture.getWidth(), iconTexture.getHeight(), false);
+		customFrameBuffer.bind();
+		SpriteBatch batch = new SpriteBatch();
+		batch.setShader(new GfxShader());
+
+		Gdx.gl.glClearColor(0, 0, 0, 0);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+		batch.begin();
+		batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+		batch.draw(iconTextureRegion, 0, 0);
+		batch.end();
+
+		gfx.put((2 << 16) | 132, customFrameBuffer.getColorBufferTexture());
+		customFrameBuffer.dispose();
 	}
 
 	public static EnfFile.Npc getNpcData(int id) {

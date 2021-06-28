@@ -56,6 +56,11 @@ public class Packet {
 		return new String(buffer.array(), startPosition, length, StandardCharsets.US_ASCII);
 	}
 
+	public String readEndString() {
+		// encoding?
+		return new String(buffer.array(), buffer.position(), buffer.remaining());
+	}
+
 	public int readUnencodedByte() {
 		return buffer.get() & 0xFF;
 	}
