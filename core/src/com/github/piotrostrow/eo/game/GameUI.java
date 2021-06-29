@@ -14,22 +14,28 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.piotrostrow.eo.assets.Assets;
 import com.github.piotrostrow.eo.ui.actors.ChatBar;
 import com.github.piotrostrow.eo.ui.actors.ChatWindow;
-import com.github.piotrostrow.eo.ui.actors.Inventory;
+import com.github.piotrostrow.eo.ui.actors.InventoryWindow;
+import com.github.piotrostrow.eo.ui.actors.PaperdollWindow;
 
 public class GameUI extends Stage {
 
 	private Actor currentComponent;
 
 	private final ChatBar chatBar;
+	private final PaperdollWindow paperdollWindow;
 
-	private final Inventory inventory;
+	private final InventoryWindow inventoryWindow;
 	private final ChatWindow chatWindow;
 
 	public GameUI(GameScreen gameScreen) {
 		super(new ScreenViewport());
 
-		inventory = new Inventory();
-		addComponent(inventory);
+		paperdollWindow = new PaperdollWindow();
+		paperdollWindow.setVisible(false);
+		addActor(paperdollWindow);
+
+		inventoryWindow = new InventoryWindow(gameScreen, paperdollWindow);
+		addComponent(inventoryWindow);
 
 		chatWindow = new ChatWindow();
 		addComponent(chatWindow);
@@ -52,7 +58,7 @@ public class GameUI extends Stage {
 				@Override
 				public void clicked(InputEvent event, float x, float y) {
 					switch(index) {
-						case 0: showComponent(inventory); break;
+						case 0: showComponent(inventoryWindow); break;
 						case 4: showComponent(chatWindow); break;
 						default: showComponent(null); break;
 					}
@@ -81,7 +87,7 @@ public class GameUI extends Stage {
 			switch(keyCode){
 				case Input.Keys.B:
 				case Input.Keys.I:
-					showComponent(inventory);
+					showComponent(inventoryWindow);
 					break;
 				case Input.Keys.TAB:
 					showComponent(chatWindow);

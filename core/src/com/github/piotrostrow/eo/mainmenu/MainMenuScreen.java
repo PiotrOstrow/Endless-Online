@@ -8,6 +8,8 @@ import com.github.piotrostrow.eo.assets.Assets;
 import com.github.piotrostrow.eo.character.NonPlayerCharacter;
 import com.github.piotrostrow.eo.character.PlayerCharacter;
 import com.github.piotrostrow.eo.game.GameScreen;
+import com.github.piotrostrow.eo.game.Inventory;
+import com.github.piotrostrow.eo.game.Item;
 import com.github.piotrostrow.eo.map.Zone;
 import com.github.piotrostrow.eo.net.ConnectionListener;
 import com.github.piotrostrow.eo.net.Packet;
@@ -27,6 +29,7 @@ import com.github.piotrostrow.eo.ui.stages.CharacterSelectStage;
 import com.github.piotrostrow.eo.ui.stages.MainMenuStage;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainMenuScreen implements Screen, ConnectionListener {
 
@@ -178,9 +181,11 @@ public class MainMenuScreen implements Screen, ConnectionListener {
 			int weight = packet.readEncodedByte();
 			int maxWeight = packet.readEncodedByte();
 
-			while(!packet.peekAndSkipUnencodedByte()){
+			List<Item> itemList = new ArrayList<>();
+			while(!packet.peekAndSkipUnencodedByte()) {
 				int itemID = packet.readEncodedShort();
 				int amount = packet.readEncodedInt();
+				itemList.add(new Item(itemID, amount));
 			}
 
 			while(!packet.peekAndSkipUnencodedByte()){
@@ -217,7 +222,7 @@ public class MainMenuScreen implements Screen, ConnectionListener {
 				zone.addNpc(npc);
 			}
 
-			Main.instance.setScreen(new GameScreen(zone, player));
+			Main.instance.setScreen(new GameScreen(zone, player, new Inventory(itemList, weight, maxWeight)));
 		} else {
 			throw new RuntimeException("Unknown welcome reply packet subID: " + subID);
 		}

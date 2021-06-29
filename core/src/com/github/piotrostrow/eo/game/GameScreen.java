@@ -20,15 +20,17 @@ public class GameScreen implements Screen {
 
 	private Zone currentZone;
 
-	private PlayerCharacter player;
+	private final PlayerCharacter player;
+	private final Inventory inventory;
 
 	private final PlayerCharacterController characterController;
 
 	private GameUI gameUI;
 
-	public GameScreen(Zone zone, PlayerCharacter player) {
+	public GameScreen(Zone zone, PlayerCharacter player, Inventory inventory) {
 		this.currentZone = zone;
 		this.player = player;
+		this.inventory = inventory;
 
 		Main.client.setConnectionListener(new GamePacketHandler(this));
 		Main.client.registerPacketHandler(PacketFamily.PACKET_WARP, PacketAction.PACKET_AGREE, this::handleWarpAgreePacket);
@@ -151,5 +153,9 @@ public class GameScreen implements Screen {
 
 	public GameUI getGameUI() {
 		return gameUI;
+	}
+
+	public Inventory getInventory() {
+		return inventory;
 	}
 }
