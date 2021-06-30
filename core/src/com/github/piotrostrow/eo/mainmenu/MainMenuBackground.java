@@ -15,7 +15,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.github.piotrostrow.eo.assets.Assets;
 import com.github.piotrostrow.eo.character.MainMenuBackgroundNPC;
 import com.github.piotrostrow.eo.map.Zone;
-import com.github.piotrostrow.eo.map.emf.AnimatedMapTile;
+import com.github.piotrostrow.eo.map.AnimatedMapTile;
 import com.github.piotrostrow.eo.map.emf.EmfMap;
 import com.github.piotrostrow.eo.map.emf.Spawner;
 import com.github.piotrostrow.eo.net.structs.NpcData;

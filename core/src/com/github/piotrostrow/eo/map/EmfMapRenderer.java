@@ -1,17 +1,17 @@
-package com.github.piotrostrow.eo.map.emf;
+package com.github.piotrostrow.eo.map;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.piotrostrow.eo.character.CharacterEntity;
 import com.github.piotrostrow.eo.graphics.GfxShader;
+import com.github.piotrostrow.eo.map.emf.EmfMap;
+import com.github.piotrostrow.eo.map.emf.MapLayer;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,27 +42,13 @@ public class EmfMapRenderer implements Disposable {
 
 	private List<CharacterEntity> characters;
 
-	/**
-	 * Shader reference to dispose, can be null
-	 */
-	private ShaderProgram shader;
+	private final MapCursor mapCursor = new MapCursor();
 
-	/**
-	 * Creates an instance where the shader is managed internally
-	 */
-	public EmfMapRenderer(EmfMap map) {
-		this(map, new ArrayList<>());
-	}
-
-	/**
-	 * Creates an instance where the shader is managed internally
-	 */
 	public EmfMapRenderer(EmfMap map, List<CharacterEntity> characters) {
 		this.map = map;
 		this.characters = characters;
 		this.batch = new SpriteBatch();
-		this.shader = new GfxShader();
-		this.batch.setShader(shader);
+		this.batch.setShader(new GfxShader());
 
 		float width = 1280;
 		float height = 720;
@@ -92,6 +78,7 @@ public class EmfMapRenderer implements Disposable {
 		batch.begin();
 
 		renderLayer(map.groundLayer);
+		renderMapCursor();
 		renderShadowLayer();
 
 		renderMiddleLayers();
@@ -100,6 +87,31 @@ public class EmfMapRenderer implements Disposable {
 		renderLayer(map.roofLayer, -132, 0);
 
 		batch.end();
+	}
+
+	private void renderMapCursor() {
+		TextureRegion mapCursorTextureRegion = mapCursor.getTextureRegion();
+		if(mapCursorTextureRegion != null) {
+			int col = mapCursor.getPosition().x;
+			int row = mapCursor.getPosition().y;
+
+			float x = (col * 32) + (row * 32);
+			float y = (row * 16) - (col * 16);
+
+			batch.draw(mapCursorTextureRegion, x, y);
+		}
+
+		TextureRegion mapCursorClickTextureRegion = mapCursor.getClickTextureRegion();
+		if(mapCursorClickTextureRegion != null) {
+			int col = mapCursor.getClickPosition().x;
+			int row = mapCursor.getClickPosition().y;
+
+			float x = (col * 32) + (row * 32);
+			float y = (row * 16) - (col * 16);
+
+			batch.setColor(1, 1, 1, 1.0f - mapCursor.getAnimationProgress());
+			batch.draw(mapCursorClickTextureRegion, x, y);
+		}
 	}
 
 	private void renderMiddleLayers() {
@@ -236,10 +248,12 @@ public class EmfMapRenderer implements Disposable {
 		bottomRight.set(viewBounds.x + viewBounds.width, viewBounds.y + viewBounds.height);
 	}
 
+	public MapCursor getMapCursor() {
+		return mapCursor;
+	}
+
 	@Override
 	public void dispose() {
 		batch.dispose();
-		if(shader != null)
-			shader.dispose();
 	}
 }

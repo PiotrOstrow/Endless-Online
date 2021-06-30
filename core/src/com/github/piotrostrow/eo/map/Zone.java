@@ -6,7 +6,6 @@ import com.github.piotrostrow.eo.character.CharacterEntity;
 import com.github.piotrostrow.eo.character.NonPlayerCharacter;
 import com.github.piotrostrow.eo.character.PlayerCharacter;
 import com.github.piotrostrow.eo.map.emf.EmfMap;
-import com.github.piotrostrow.eo.map.emf.EmfMapRenderer;
 
 import java.util.ArrayList;
 

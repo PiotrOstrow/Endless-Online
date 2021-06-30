@@ -1,6 +1,5 @@
-package com.github.piotrostrow.eo.map.emf;
+package com.github.piotrostrow.eo.map;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -16,7 +15,7 @@ public class AnimatedMapTile implements MapTile {
 	 * @param texture texture split in 4 horizontally
 	 * @param timestamp a timestamp to synchronize the animation across all animated map tiles
 	 */
-	AnimatedMapTile(Texture texture, long timestamp) {
+	public AnimatedMapTile(Texture texture, long timestamp) {
 		this.lastSync = timestamp;
 
 		TextureRegion[] regions = new TextureRegion[4];

@@ -1,4 +1,4 @@
-package com.github.piotrostrow.eo.map.emf;
+package com.github.piotrostrow.eo.map;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 

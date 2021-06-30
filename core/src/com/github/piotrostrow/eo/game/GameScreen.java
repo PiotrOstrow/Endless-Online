@@ -88,6 +88,18 @@ public class GameScreen implements Screen {
 			gameUI = new GameUI(this);
 			Gdx.input.setInputProcessor(new InputMultiplexer(gameUI, characterController));
 		}
+
+		// update map cursor position TODO: and cursor type
+		Camera camera = currentZone.getMapRenderer().camera;
+		float screenX = camera.position.x + Gdx.input.getX() - camera.viewportWidth / 2;
+		float screenY = camera.position.y - Gdx.input.getY() + camera.viewportHeight / 2 - 16;
+		int mouseMapX = (int)(-(screenY / 16 + -(screenX / 32)) / 2);
+		int mouseMapY = (int)((screenX / 32 + screenY / 16) / 2) - 1;
+		currentZone.getMapRenderer().getMapCursor().getPosition().set(mouseMapX, mouseMapY);
+
+		if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+			currentZone.getMapRenderer().getMapCursor().clickAnimation(mouseMapX, mouseMapY);
+		}
 	}
 
 	private void update(){

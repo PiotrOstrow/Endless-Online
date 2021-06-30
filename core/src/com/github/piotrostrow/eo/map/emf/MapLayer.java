@@ -3,6 +3,9 @@ package com.github.piotrostrow.eo.map.emf;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.github.piotrostrow.eo.assets.Assets;
+import com.github.piotrostrow.eo.map.AnimatedMapTile;
+import com.github.piotrostrow.eo.map.MapTile;
+import com.github.piotrostrow.eo.map.StaticMapTile;
 
 import java.io.IOException;
 
