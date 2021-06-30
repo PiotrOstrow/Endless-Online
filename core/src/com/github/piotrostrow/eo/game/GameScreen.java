@@ -97,7 +97,7 @@ public class GameScreen implements Screen {
 		int mouseMapY = (int)((screenX / 32 + screenY / 16) / 2) - 1;
 		currentZone.getMapRenderer().getMapCursor().getPosition().set(mouseMapX, mouseMapY);
 
-		if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+		if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && gameUI.hit(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), false) == null) {
 			currentZone.getMapRenderer().getMapCursor().clickAnimation(mouseMapX, mouseMapY);
 		}
 	}

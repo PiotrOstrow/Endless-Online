@@ -111,6 +111,7 @@ public class EmfMapRenderer implements Disposable {
 
 			batch.setColor(1, 1, 1, 1.0f - mapCursor.getAnimationProgress());
 			batch.draw(mapCursorClickTextureRegion, x, y);
+			batch.setColor(1, 1, 1, 1);
 		}
 	}
 
