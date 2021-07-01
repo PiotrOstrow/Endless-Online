@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.github.piotrostrow.eo.character.CharacterEntity;
 import com.github.piotrostrow.eo.character.NonPlayerCharacter;
 import com.github.piotrostrow.eo.character.PlayerCharacter;
+import com.github.piotrostrow.eo.game.MapItem;
 import com.github.piotrostrow.eo.map.emf.EmfMap;
 
 import java.util.ArrayList;
@@ -21,9 +22,15 @@ public class Zone implements Disposable {
 	// list for rendering
 	private final ArrayList<CharacterEntity> characters = new ArrayList<>();
 
+	private final ArrayList<MapItem> mapItems = new ArrayList<>();
+
 	public Zone(EmfMap map) {
 		this.map = map;
-		this.mapRenderer = new EmfMapRenderer(map, characters);
+		this.mapRenderer = new EmfMapRenderer(map, characters, mapItems);
+	}
+
+	public void addItem(MapItem mapItem) {
+		mapItems.add(mapItem);
 	}
 
 	public void addNpc(NonPlayerCharacter npc) {

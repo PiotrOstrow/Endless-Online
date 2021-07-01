@@ -29,6 +29,7 @@ public class GamePacketHandler implements ConnectionListener {
 		Main.client.registerPacketHandler(PacketFamily.PACKET_ATTACK, PacketAction.PACKET_PLAYER, this::handleAttackPlayerPacket);
 		Main.client.registerPacketHandler(PacketFamily.PACKET_WARP, PacketAction.PACKET_REQUEST, this::handleWarpRequestPacket);
 		Main.client.registerPacketHandler(PacketFamily.PACKET_TALK, PacketAction.PACKET_PLAYER, this::handleTalkPlayerPacket);
+		Main.client.registerPacketHandler(PacketFamily.PACKET_ITEM, PacketAction.PACKET_ADD, this::handleItemAddPacket);
 	}
 
 	@Override
@@ -42,6 +43,16 @@ public class GamePacketHandler implements ConnectionListener {
 			game.dispose();
 			Main.instance.setScreen(new MainMenuScreen());
 		});
+	}
+
+	private void handleItemAddPacket(Packet packet) {
+		int id = packet.readEncodedShort();
+		int uid = packet.readEncodedShort();
+		int amount = packet.readEncodedThreeByteInt();
+		int x = packet.readEncodedByte();
+		int y = packet.readEncodedByte();
+
+		game.getZone().addItem(new MapItem(id, uid, amount, x, y));
 	}
 
 	private void handleTalkPlayerPacket(Packet packet) {

@@ -22,7 +22,9 @@ import com.github.piotrostrow.eo.map.emf.EmfMap;
 import com.github.piotrostrow.eo.map.emf.EmfMapLoader;
 import com.github.piotrostrow.eo.pe.PEFile;
 import com.github.piotrostrow.eo.pe.ResourceDataEntry;
+import com.github.piotrostrow.eo.pub.EifFile;
 import com.github.piotrostrow.eo.pub.EnfFile;
+import com.github.piotrostrow.eo.pub.ItemData;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +40,7 @@ public class Assets {
 	private static final BitmapFontLoader.BitmapFontParameter bitmapLoaderParameters;
 
 	private static EnfFile enfFile;
+	private static EifFile eifFile;
 
 	static {
 		textureParameters = new TextureLoader.TextureParameter();
@@ -50,6 +53,7 @@ public class Assets {
 
 		try {
 			enfFile = new EnfFile(new File(Config.GAME_PATH + "/pub/dtn001.enf"));
+			eifFile = new EifFile(new File(Config.GAME_PATH + "/pub/dat001.eif"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -92,6 +96,10 @@ public class Assets {
 			npcData.initialize();
 
 		return npcData;
+	}
+
+	public static ItemData getItemData(int itemID) {
+		return eifFile.getItemData(itemID);
 	}
 
 	private static void loadTextures() {

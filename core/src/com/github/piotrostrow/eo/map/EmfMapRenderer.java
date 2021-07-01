@@ -1,6 +1,7 @@
 package com.github.piotrostrow.eo.map;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
@@ -8,6 +9,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.piotrostrow.eo.character.CharacterEntity;
+import com.github.piotrostrow.eo.game.MapItem;
 import com.github.piotrostrow.eo.graphics.GfxShader;
 import com.github.piotrostrow.eo.map.emf.EmfMap;
 import com.github.piotrostrow.eo.map.emf.MapLayer;
@@ -40,13 +42,16 @@ public class EmfMapRenderer implements Disposable {
 
 	private int row1, row2, col1, col2;
 
-	private List<CharacterEntity> characters;
+	private final List<CharacterEntity> characters;
+	private final List<MapItem> mapItems;
 
 	private final MapCursor mapCursor = new MapCursor();
 
-	public EmfMapRenderer(EmfMap map, List<CharacterEntity> characters) {
+	public EmfMapRenderer(EmfMap map, List<CharacterEntity> characters, List<MapItem> mapItems) {
 		this.map = map;
 		this.characters = characters;
+		this.mapItems = mapItems;
+
 		this.batch = new SpriteBatch();
 		this.batch.setShader(new GfxShader());
 
@@ -79,6 +84,7 @@ public class EmfMapRenderer implements Disposable {
 
 		renderLayer(map.groundLayer);
 		renderMapCursor();
+		renderItems();
 		renderShadowLayer();
 
 		renderMiddleLayers();
@@ -87,6 +93,17 @@ public class EmfMapRenderer implements Disposable {
 		renderLayer(map.roofLayer, -132, 0);
 
 		batch.end();
+	}
+
+	private void renderItems() {
+		for(MapItem mapItem : mapItems) {
+			// TODO:
+//			if(mapItem.getPosition().x < )
+			Texture texture = mapItem.getMapTexture();
+			float x = (mapItem.getPosition().x * 32) - (mapItem.getPosition().y * 32);
+			float y = -((mapItem.getPosition().y * 16) + (mapItem.getPosition().x * 16));
+			batch.draw(texture, x + ((64 - texture.getWidth()) / 2f), y - ((texture.getHeight() - 32) / 2f));
+		}
 	}
 
 	private void renderMapCursor() {
