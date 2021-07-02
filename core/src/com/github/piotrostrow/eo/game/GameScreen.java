@@ -98,6 +98,10 @@ public class GameScreen implements Screen {
 		currentZone.getMapRenderer().getMapCursor().getPosition().set(mouseMapX, mouseMapY);
 
 		if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && gameUI.hit(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), false) == null) {
+
+			// if (not picking up items and whatnot)
+			characterController.goTo(mouseMapX, -mouseMapY);
+
 			currentZone.getMapRenderer().getMapCursor().clickAnimation(mouseMapX, mouseMapY);
 		}
 	}

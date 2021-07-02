@@ -62,6 +62,14 @@ public class Zone implements Disposable {
 		return null;
 	}
 
+	public int getWidth() {
+		return map.getWidth();
+	}
+
+	public int getHeight() {
+		return map.getHeight();
+	}
+
 	public boolean isBlocked(GridPoint2 position) {
 		return isBlocked(position.x, position.y);
 	}

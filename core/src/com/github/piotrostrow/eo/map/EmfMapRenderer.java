@@ -102,7 +102,7 @@ public class EmfMapRenderer implements Disposable {
 			Texture texture = mapItem.getMapTexture();
 			float x = (mapItem.getPosition().x * 32) - (mapItem.getPosition().y * 32);
 			float y = -((mapItem.getPosition().y * 16) + (mapItem.getPosition().x * 16));
-			batch.draw(texture, x + ((64 - texture.getWidth()) / 2f), y - ((texture.getHeight() - 32) / 2f));
+			batch.draw(texture, x + ((64 - texture.getWidth()) / 2), y - ((texture.getHeight() - 32) / 2));
 		}
 	}
 
