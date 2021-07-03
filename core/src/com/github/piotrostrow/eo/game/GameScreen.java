@@ -13,6 +13,7 @@ import com.github.piotrostrow.eo.map.Zone;
 import com.github.piotrostrow.eo.net.Packet;
 import com.github.piotrostrow.eo.net.PacketAction;
 import com.github.piotrostrow.eo.net.PacketFamily;
+import com.github.piotrostrow.eo.net.packets.warp.DoorOpenPacket;
 import com.github.piotrostrow.eo.net.structs.NpcData;
 import com.github.piotrostrow.eo.net.structs.PlayerData;
 
@@ -89,20 +90,24 @@ public class GameScreen implements Screen {
 			Gdx.input.setInputProcessor(new InputMultiplexer(gameUI, characterController));
 		}
 
-		// update map cursor position TODO: and cursor type
+		// calculate map grid position of mouse cursor
 		Camera camera = currentZone.getMapRenderer().camera;
 		float screenX = camera.position.x + Gdx.input.getX() - camera.viewportWidth / 2;
 		float screenY = camera.position.y - Gdx.input.getY() + camera.viewportHeight / 2 - 16;
 		int mouseMapX = (int)(-(screenY / 16 + -(screenX / 32)) / 2);
-		int mouseMapY = (int)((screenX / 32 + screenY / 16) / 2) - 1;
-		currentZone.getMapRenderer().getMapCursor().getPosition().set(mouseMapX, mouseMapY);
+		int mouseMapY = (int)-(((screenX / 32 + screenY / 16) / 2) - 1);
 
+		// update map cursor position TODO: and cursor type
+		currentZone.getMapRenderer().getMapCursor().getPosition().set(mouseMapX, -mouseMapY);
+
+		// on click when no ui element is hit - open doors, pickup items, go to mouse coords
 		if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && gameUI.hit(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), false) == null) {
-
-			// if (not picking up items and whatnot)
-			characterController.goTo(mouseMapX, -mouseMapY);
-
-			currentZone.getMapRenderer().getMapCursor().clickAnimation(mouseMapX, mouseMapY);
+			if (currentZone.hasDoor(mouseMapX, mouseMapY) && !currentZone.isDoorOpen(mouseMapX, mouseMapY)) {
+				Main.client.sendEncodedPacket(new DoorOpenPacket(mouseMapX, mouseMapY));
+			} else {
+				characterController.goTo(mouseMapX, mouseMapY);
+				currentZone.getMapRenderer().getMapCursor().clickAnimation(mouseMapX, -mouseMapY);
+			}
 		}
 	}
 

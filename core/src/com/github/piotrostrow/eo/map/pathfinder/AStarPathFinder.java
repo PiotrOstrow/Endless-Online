@@ -55,7 +55,7 @@ public class AStarPathFinder implements PathFinder {
 
 		return path;
 	}
-	
+
 	private List<Node> getAdjacentNodes(Node node) {
 		List<Node> adjacentNodes = new ArrayList<>();
 

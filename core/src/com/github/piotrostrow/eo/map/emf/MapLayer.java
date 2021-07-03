@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.github.piotrostrow.eo.assets.Assets;
 import com.github.piotrostrow.eo.map.AnimatedMapTile;
+import com.github.piotrostrow.eo.map.DoorMapTile;
 import com.github.piotrostrow.eo.map.MapTile;
 import com.github.piotrostrow.eo.map.StaticMapTile;
 
@@ -71,33 +72,26 @@ public class MapLayer {
 				throw new RuntimeException("Unknown layer index: " + layerIndex);
 		}
 
+		// ground layer
 		if(texture != null) {
-
-			switch (gfxID) {
-				//all the animated tiles
-				case 396:
-				case 397:
-				case 555:
-				case 561:
-				case 562:
-				case 563:
-				case 564:
-				case 565:
-				case 601:
-				case 614:
-				case 648:
-				case 649:
-				case 685:
-				case 716:
-				case 751:
-				case 752:
-				case 760:
+			if (layerIndex == 0 ||layerIndex == 6) {
+				// all the animated tiles from folder 3, guess it's easier to just check texture width instead of hardcoding indices
+				if(texture.getWidth() > 64) {
 					tiles[x][y] = new AnimatedMapTile(texture, timestamp);
-					break;
-				default:
-					tiles[x][y] = new StaticMapTile(texture);
-					break;
+					return;
+				}
+			} else if(layerIndex == 3 || layerIndex == 4) {
+				switch (gfxID) {
+					case 304: case 432: case 434: case 436: case 438: case 440: case 442: case 444: case 446: case 448:
+					case 531: case 584: case 586: case 588: case 590: case 674: case 676: case 742: case 750: case 791:
+					case 806: case 824: case 826: case 834: case 836: case 852: case 886: case 879: case 881: case 900:
+					case 908: case 929: case 941: case 949: case 1163:
+						tiles[x][y] = new DoorMapTile(texture, Assets.gfx(6, gfxID + 1));
+						return;
+				}
 			}
+
+			tiles[x][y] = new StaticMapTile(texture);
 		}
 	}
 

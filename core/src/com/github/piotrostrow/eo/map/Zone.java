@@ -7,8 +7,11 @@ import com.github.piotrostrow.eo.character.NonPlayerCharacter;
 import com.github.piotrostrow.eo.character.PlayerCharacter;
 import com.github.piotrostrow.eo.game.MapItem;
 import com.github.piotrostrow.eo.map.emf.EmfMap;
+import com.github.piotrostrow.eo.map.emf.Warp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Zone implements Disposable {
 
@@ -24,9 +27,49 @@ public class Zone implements Disposable {
 
 	private final ArrayList<MapItem> mapItems = new ArrayList<>();
 
+	// some maps have tons of warps
+	private final Map<GridPoint2, Warp> warps = new HashMap<>();
+
 	public Zone(EmfMap map) {
 		this.map = map;
 		this.mapRenderer = new EmfMapRenderer(map, characters, mapItems);
+
+		for(Warp warp : map.warps)
+			warps.put(new GridPoint2(warp.x, warp.y), warp);
+	}
+
+	public boolean hasDoor(int x, int y) {
+		return map.wallsEastLayer.getTile(x, y) instanceof DoorMapTile || map.wallsSouthLayer.getTile(x, y) instanceof DoorMapTile;
+	}
+
+	public void openDoor(int x, int y) {
+		MapTile mapTile = map.wallsEastLayer.getTile(x, y);
+
+		if(mapTile != null)
+			mapTile.trigger();
+
+		mapTile = map.wallsSouthLayer.getTile(x, y);
+
+		if(mapTile != null)
+			mapTile.trigger();
+	}
+
+	public boolean isDoorOpen(int x, int y) {
+		MapTile mapTile = map.wallsEastLayer.getTile(x, y);
+
+		if(mapTile instanceof DoorMapTile)
+			return ((DoorMapTile)mapTile).isOpen();
+
+		mapTile = map.wallsSouthLayer.getTile(x, y);
+
+		if(mapTile instanceof DoorMapTile)
+			return ((DoorMapTile)mapTile).isOpen();
+
+		return false;
+	}
+
+	public Warp getWarp(GridPoint2 pos) {
+		return warps.get(pos);
 	}
 
 	public void addItem(MapItem mapItem) {
@@ -96,6 +139,10 @@ public class Zone implements Disposable {
 
 	public EmfMapRenderer getMapRenderer() {
 		return mapRenderer;
+	}
+
+	public EmfMap getMap() {
+		return map;
 	}
 
 	@Override

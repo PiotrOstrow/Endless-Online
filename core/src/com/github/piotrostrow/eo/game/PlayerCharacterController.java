@@ -8,12 +8,14 @@ import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.character.CharacterState;
 import com.github.piotrostrow.eo.character.Direction;
 import com.github.piotrostrow.eo.character.PlayerCharacter;
+import com.github.piotrostrow.eo.map.emf.Warp;
 import com.github.piotrostrow.eo.map.pathfinder.AStarPathFinder;
 import com.github.piotrostrow.eo.map.pathfinder.PathFinder;
 import com.github.piotrostrow.eo.net.Packet;
 import com.github.piotrostrow.eo.net.packets.walk.AttackUsePacket;
 import com.github.piotrostrow.eo.net.packets.walk.FacePlayerPacket;
 import com.github.piotrostrow.eo.net.packets.walk.WalkPlayerPacket;
+import com.github.piotrostrow.eo.net.packets.warp.DoorOpenPacket;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -25,12 +27,19 @@ public class PlayerCharacterController implements InputProcessor {
 	 */
 	private static final int TURN_DELAY = 250;
 
+	/**
+	 * The delay between opening a door and moving forward when holding down a movement key
+	 */
+	private static final int DOOR_OPEN_DELAY = 300;
+
 	private boolean lock = false;
+	private long lockRelease = 0;
 
 	private final GameScreen gameScreen;
 	private final PlayerCharacter player;
 
 	private long lastTurn;
+	private long lastDoorOpen;
 	private CharacterState previousFrameState = CharacterState.IDLE;
 
 	private final boolean[] pressedKeys = new boolean[256];
@@ -55,6 +64,9 @@ public class PlayerCharacterController implements InputProcessor {
 	}
 
 	public void update() {
+		if(lock && lockRelease < System.currentTimeMillis())
+			lock = false;
+
 		if (!lock && player.getCharacterState() == CharacterState.IDLE) {
 			// any input breaks path following
 			boolean wasFollowingPath = isFollowingPath;
@@ -133,6 +145,20 @@ public class PlayerCharacterController implements InputProcessor {
 			return;
 		}
 
+		Warp warp = gameScreen.getZone().getWarp(temp);
+		if (warp != null && warp.doorType >= 1) {
+			if(lastDoorOpen + DOOR_OPEN_DELAY > System.currentTimeMillis())
+				return;
+
+			if(!gameScreen.getZone().isDoorOpen(warp.x, warp.y)) {
+				// TODO: check if has key
+
+				lastDoorOpen = System.currentTimeMillis();
+				Main.client.sendEncodedPacket(new DoorOpenPacket(warp.x, warp.y));
+				return;
+			}
+		}
+
 		player.move(direction);
 
 		Packet packet = new WalkPlayerPacket(direction, player.getPosition().x, player.getPosition().y);
@@ -184,5 +210,20 @@ public class PlayerCharacterController implements InputProcessor {
 	public void lock(boolean lock) {
 		this.lock = lock;
 		this.isFollowingPath = false;
+		lockRelease = Long.MAX_VALUE;
+	}
+
+	public void lock(long ms) {
+		this.lock = true;
+		this.isFollowingPath = false;
+		lockRelease = System.currentTimeMillis() + ms;
+	}
+
+	public void release() {
+		pressedKeys[Input.Keys.CONTROL_LEFT] = false;
+		pressedKeys[Input.Keys.W] = false;
+		pressedKeys[Input.Keys.S] = false;
+		pressedKeys[Input.Keys.A] = false;
+		pressedKeys[Input.Keys.D] = false;
 	}
 }

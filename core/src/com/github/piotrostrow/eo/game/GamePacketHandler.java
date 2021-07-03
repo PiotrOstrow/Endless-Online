@@ -30,6 +30,7 @@ public class GamePacketHandler implements ConnectionListener {
 		Main.client.registerPacketHandler(PacketFamily.PACKET_WARP, PacketAction.PACKET_REQUEST, this::handleWarpRequestPacket);
 		Main.client.registerPacketHandler(PacketFamily.PACKET_TALK, PacketAction.PACKET_PLAYER, this::handleTalkPlayerPacket);
 		Main.client.registerPacketHandler(PacketFamily.PACKET_ITEM, PacketAction.PACKET_ADD, this::handleItemAddPacket);
+		Main.client.registerPacketHandler(PacketFamily.PACKET_DOOR, PacketAction.PACKET_OPEN, this::handleDoorOpenPacket);
 	}
 
 	@Override
@@ -43,6 +44,12 @@ public class GamePacketHandler implements ConnectionListener {
 			game.dispose();
 			Main.instance.setScreen(new MainMenuScreen());
 		});
+	}
+
+	private void handleDoorOpenPacket(Packet packet) {
+		int x = packet.readEncodedByte();
+		int y = packet.readEncodedShort();
+		game.getZone().openDoor(x, y);
 	}
 
 	private void handleItemAddPacket(Packet packet) {
@@ -106,10 +113,17 @@ public class GamePacketHandler implements ConnectionListener {
 			PlayerData playerData = new PlayerData(packet);
 
 			PlayerCharacter player = game.getZone().getPlayer(playerData.playerID);
-			if (player != null)
+			if (player != null) {
+				// If updating own player, i suppose you should check whether or not the position is the same before
+				// and after. If not then stop the players character by locking the controller for a bit, otherwise weird
+				// things happen when spamming buttons, produces bugs most likely due to server not refreshing often enough
+				if(player == game.getOwnCharacter() && (player.getPosition().x != playerData.x || player.getPosition().y != playerData.y))
+					game.getCharacterController().lock(500);
+
 				player.updateData(playerData);
-			else
+			} else {
 				game.getZone().addPlayer(new PlayerCharacter(playerData));
+			}
 		}
 
 		while (!packet.peekAndSkipUnencodedByte()) {
