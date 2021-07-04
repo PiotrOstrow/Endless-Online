@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -69,23 +70,32 @@ public class Assets {
 
 	private static void processTextures() {
 		Texture iconTexture = gfx(2, 132);
-		TextureRegion iconTextureRegion = new TextureRegion(iconTexture);
-		iconTextureRegion.flip(false, true);
-
-		CustomFrameBuffer customFrameBuffer = new CustomFrameBuffer(Pixmap.Format.RGBA8888, iconTexture.getWidth(), iconTexture.getHeight(), false);
-		customFrameBuffer.bind();
 		SpriteBatch batch = new SpriteBatch();
 		batch.setShader(new GfxShader());
+
+		processTexture(batch, 2, 132);
+		processTexture(batch, 2, 158);
+
+		batch.dispose();
+	}
+
+	private static void processTexture(Batch batch, int folder, int ID) {
+		Texture texture = gfx(folder, ID);
+		TextureRegion textureRegion = new TextureRegion(texture);
+		textureRegion.flip(false, true);
+
+		CustomFrameBuffer customFrameBuffer = new CustomFrameBuffer(Pixmap.Format.RGBA8888, texture.getWidth(), texture.getHeight(), false);
+		customFrameBuffer.bind();
 
 		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		batch.begin();
 		batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
-		batch.draw(iconTextureRegion, 0, 0);
+		batch.draw(textureRegion, 0, 0);
 		batch.end();
 
-		gfx.put((2 << 16) | 132, customFrameBuffer.getColorBufferTexture());
+		gfx.put((folder << 16) | ID, customFrameBuffer.getColorBufferTexture());
 		customFrameBuffer.dispose();
 	}
 

@@ -8,14 +8,12 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.piotrostrow.eo.assets.Assets;
-import com.github.piotrostrow.eo.ui.actors.ChatBar;
-import com.github.piotrostrow.eo.ui.actors.ChatWindow;
-import com.github.piotrostrow.eo.ui.actors.InventoryWindow;
-import com.github.piotrostrow.eo.ui.actors.PaperdollWindow;
+import com.github.piotrostrow.eo.ui.actors.*;
 
 public class GameUI extends Stage {
 
@@ -23,6 +21,11 @@ public class GameUI extends Stage {
 
 	private final ChatBar chatBar;
 	private final PaperdollWindow paperdollWindow;
+
+	private final StatusBar hpBar;
+	private final StatusBar tpBar;
+	private final StatusBar staminaBar;
+	private final StatusBar expBar;
 
 	private final InventoryWindow inventoryWindow;
 	private final ChatWindow chatWindow;
@@ -33,6 +36,20 @@ public class GameUI extends Stage {
 		paperdollWindow = new PaperdollWindow();
 		paperdollWindow.setVisible(false);
 		addActor(paperdollWindow);
+
+		hpBar = new StatusBar(0);
+		tpBar = new StatusBar(1);
+		staminaBar = new StatusBar(2);
+		expBar = new StatusBar(3);
+
+		HorizontalGroup statusBars = new HorizontalGroup();
+		statusBars.addActor(hpBar);
+		statusBars.addActor(tpBar);
+		statusBars.addActor(staminaBar);
+		statusBars.addActor(expBar);
+		statusBars.pack();
+		statusBars.setPosition(Gdx.graphics.getWidth() / 2 - Math.round(statusBars.getWidth() / 2), Gdx.graphics.getHeight() - statusBars.getHeight());
+		addActor(statusBars);
 
 		inventoryWindow = new InventoryWindow(gameScreen, paperdollWindow);
 		addComponent(inventoryWindow);
@@ -68,6 +85,16 @@ public class GameUI extends Stage {
 			button.setPosition(4, 4 + button.getHeight() * 10 - button.getHeight() * i);
 			addActor(button);
 		}
+	}
+
+	@Override
+	public void act(float delta) {
+		super.act(delta);
+
+		hpBar.setValue(1.0f);
+		tpBar.setValue(1.0f);
+		staminaBar.setValue(1.0f);
+		expBar.setValue(0.0f);
 	}
 
 	@Override
