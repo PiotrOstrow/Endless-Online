@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class EmfMap {
 
+	private final int mapID;
 	private String mapName;
 
 	private final int mapType;
@@ -36,7 +37,9 @@ public class EmfMap {
 	public final ArrayList<Warp> warps;
 	public final ArrayList<SignMessage> msgs = new ArrayList<>();
 
-	EmfMap(EmfFileInputStream stream) throws IOException {
+	EmfMap(EmfFileInputStream stream, int mapID) throws IOException {
+		this.mapID = mapID;
+
 		// skip magic number
 		stream.skip(3);
 
@@ -142,5 +145,9 @@ public class EmfMap {
 
 	public int getHeight() {
 		return height;
+	}
+
+	public int getID() {
+		return mapID;
 	}
 }

@@ -22,7 +22,7 @@ public class EmfMapLoader extends SynchronousAssetLoader<EmfMap, AssetLoaderPara
 
 		try {
 			EmfFileInputStream stream = new EmfFileInputStream(file.read());
-			emfMap = new EmfMap(stream);
+			emfMap = new EmfMap(stream, Integer.parseInt(file.nameWithoutExtension()));
 			stream.close();
 		}catch (IOException e){
 			e.printStackTrace();

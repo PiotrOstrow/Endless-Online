@@ -15,6 +15,7 @@ import com.github.piotrostrow.eo.map.Zone;
 import com.github.piotrostrow.eo.net.Packet;
 import com.github.piotrostrow.eo.net.PacketAction;
 import com.github.piotrostrow.eo.net.PacketFamily;
+import com.github.piotrostrow.eo.net.packets.talk.TalkReportPacket;
 import com.github.piotrostrow.eo.net.packets.warp.DoorOpenPacket;
 import com.github.piotrostrow.eo.net.structs.NpcData;
 import com.github.piotrostrow.eo.net.structs.PlayerData;
@@ -101,12 +102,17 @@ public class GameScreen implements Screen {
 			currentZone.getMapRenderer().getMapCursor().setCursorType(MapCursor.CursorType.WHITE);
 
 			// on click when no ui element is hit - open doors, pickup items, go to mouse coords
-			if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && gameUI.hit(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), false) == null) {
-				if (currentZone.hasDoor(mouseMapX, mouseMapY) && !currentZone.isDoorOpen(mouseMapX, mouseMapY)) {
-					Main.client.sendEncodedPacket(new DoorOpenPacket(mouseMapX, mouseMapY));
-				} else {
-					characterController.goTo(mouseMapX, mouseMapY);
-					currentZone.getMapRenderer().getMapCursor().clickAnimation(mouseMapX, -mouseMapY);
+			if (gameUI.hit(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), false) == null) {
+				if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+					if (currentZone.hasDoor(mouseMapX, mouseMapY) && !currentZone.isDoorOpen(mouseMapX, mouseMapY)) {
+						Main.client.sendEncodedPacket(new DoorOpenPacket(mouseMapX, mouseMapY));
+					} else {
+						characterController.goTo(mouseMapX, mouseMapY);
+						currentZone.getMapRenderer().getMapCursor().clickAnimation(mouseMapX, -mouseMapY);
+					}
+				} else if(Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+					int mapID = currentZone.getMap().getID();
+					Main.client.sendEncodedPacket(new TalkReportPacket("$warp " + mapID + " " + mouseMapX + " " + mouseMapY));
 				}
 			}
 		} else {
