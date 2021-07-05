@@ -5,10 +5,12 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.math.MathUtils;
 import com.github.piotrostrow.eo.Main;
 import com.github.piotrostrow.eo.assets.Assets;
 import com.github.piotrostrow.eo.character.NonPlayerCharacter;
 import com.github.piotrostrow.eo.character.PlayerCharacter;
+import com.github.piotrostrow.eo.map.MapCursor;
 import com.github.piotrostrow.eo.map.Zone;
 import com.github.piotrostrow.eo.net.Packet;
 import com.github.piotrostrow.eo.net.PacketAction;
@@ -46,7 +48,7 @@ public class GameScreen implements Screen {
 	}
 
 	protected void handleWarpAgreePacket(Packet packet) {
-		int hardcodedByte = packet.readEncodedByte();
+		packet.skip(1);
 		int mapID = packet.readEncodedShort();
 		int animation = packet.readEncodedByte();
 		int characterCount = packet.readEncodedByte();
@@ -80,10 +82,6 @@ public class GameScreen implements Screen {
 		characterController.lock(false);
 	}
 
-	public PlayerCharacter getOwnCharacter() {
-		return player;
-	}
-
 	private void input() {
 		if(Gdx.input.isKeyJustPressed(Input.Keys.F5)) { // for hotswap
 			gameUI = new GameUI(this);
@@ -94,20 +92,26 @@ public class GameScreen implements Screen {
 		Camera camera = currentZone.getMapRenderer().camera;
 		float screenX = camera.position.x + Gdx.input.getX() - camera.viewportWidth / 2;
 		float screenY = camera.position.y - Gdx.input.getY() + camera.viewportHeight / 2 - 16;
-		int mouseMapX = (int)(-(screenY / 16 + -(screenX / 32)) / 2);
-		int mouseMapY = (int)-(((screenX / 32 + screenY / 16) / 2) - 1);
+		int mouseMapX = MathUtils.floor(-(screenY / 16 - (screenX / 32)) / 2);
+		int mouseMapY = MathUtils.floor(-(((screenX / 32 + screenY / 16) / 2) - 1));
 
-		// update map cursor position TODO: and cursor type
-		currentZone.getMapRenderer().getMapCursor().getPosition().set(mouseMapX, -mouseMapY);
+		if(mouseMapX >= 0 && mouseMapX < currentZone.getWidth() && mouseMapY >= 0 && mouseMapY < currentZone.getHeight()) {
+			// update map cursor position TODO: and cursor type
+			currentZone.getMapRenderer().getMapCursor().getPosition().set(mouseMapX, -mouseMapY);
+			currentZone.getMapRenderer().getMapCursor().setCursorType(MapCursor.CursorType.WHITE);
 
-		// on click when no ui element is hit - open doors, pickup items, go to mouse coords
-		if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && gameUI.hit(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), false) == null) {
-			if (currentZone.hasDoor(mouseMapX, mouseMapY) && !currentZone.isDoorOpen(mouseMapX, mouseMapY)) {
-				Main.client.sendEncodedPacket(new DoorOpenPacket(mouseMapX, mouseMapY));
-			} else {
-				characterController.goTo(mouseMapX, mouseMapY);
-				currentZone.getMapRenderer().getMapCursor().clickAnimation(mouseMapX, -mouseMapY);
+			// on click when no ui element is hit - open doors, pickup items, go to mouse coords
+			if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && gameUI.hit(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), false) == null) {
+				if (currentZone.hasDoor(mouseMapX, mouseMapY) && !currentZone.isDoorOpen(mouseMapX, mouseMapY)) {
+					Main.client.sendEncodedPacket(new DoorOpenPacket(mouseMapX, mouseMapY));
+				} else {
+					characterController.goTo(mouseMapX, mouseMapY);
+					currentZone.getMapRenderer().getMapCursor().clickAnimation(mouseMapX, -mouseMapY);
+				}
 			}
+		} else {
+			currentZone.getMapRenderer().getMapCursor().getPosition().set(Integer.MAX_VALUE, Integer.MAX_VALUE);
+			currentZone.getMapRenderer().getMapCursor().setCursorType(MapCursor.CursorType.NONE);
 		}
 	}
 
@@ -132,8 +136,24 @@ public class GameScreen implements Screen {
 		gameUI.draw();
 	}
 
+	public PlayerCharacter getOwnCharacter() {
+		return player;
+	}
+
 	protected PlayerCharacterController getCharacterController() {
 		return characterController;
+	}
+
+	Zone getZone() {
+		return currentZone;
+	}
+
+	public GameUI getGameUI() {
+		return gameUI;
+	}
+
+	public Inventory getInventory() {
+		return inventory;
 	}
 
 	@Override
@@ -166,17 +186,5 @@ public class GameScreen implements Screen {
 		if(currentZone != null)
 			currentZone.dispose();
 		gameUI.dispose();
-	}
-
-	Zone getZone() {
-		return currentZone;
-	}
-
-	public GameUI getGameUI() {
-		return gameUI;
-	}
-
-	public Inventory getInventory() {
-		return inventory;
 	}
 }

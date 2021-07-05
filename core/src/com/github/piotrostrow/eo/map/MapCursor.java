@@ -8,7 +8,7 @@ import com.github.piotrostrow.eo.assets.Assets;
 public class MapCursor {
 
 	public enum CursorType { // TODO: change naming on these to reflect what they actually represent?
-		ORANGE, WHITE, YELLOW
+		ORANGE, WHITE, YELLOW, NONE
 	}
 
 	/**
@@ -36,9 +36,10 @@ public class MapCursor {
 
 	public void setCursorType(CursorType cursorType) {
 		switch(cursorType) {
-			case ORANGE: 	currentTextureRegion = cursors[0]; break;
-			case WHITE: 	currentTextureRegion = cursors[1]; break;
-			case YELLOW:	currentTextureRegion = cursors[2]; break;
+			case ORANGE: 	currentTextureRegion = cursors[0]; 	break;
+			case WHITE: 	currentTextureRegion = cursors[1];	break;
+			case YELLOW:	currentTextureRegion = cursors[2]; 	break;
+			case NONE: 		currentTextureRegion = null; 		break;
 		}
 	}
 
