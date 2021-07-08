@@ -99,8 +99,6 @@ public class GameUI extends Stage {
 
 	@Override
 	public boolean keyDown(int keyCode) {
-		boolean handled = super.keyUp(keyCode);
-
 		switch(keyCode){
 			case Input.Keys.ENTER:
 				chatBar.onEnterPressed();
@@ -110,6 +108,7 @@ public class GameUI extends Stage {
 				return true;
 		}
 
+		boolean handled = super.keyDown(keyCode);
 		if(!handled) {
 			switch(keyCode){
 				case Input.Keys.B:

@@ -1,11 +1,13 @@
 package com.github.piotrostrow.eo.ui.actors;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
@@ -17,6 +19,9 @@ import com.github.piotrostrow.eo.assets.Assets;
 import com.github.piotrostrow.eo.game.GameScreen;
 import com.github.piotrostrow.eo.net.packets.talk.TalkReportPacket;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ChatBar extends WidgetGroup {
 
 	private final ChatWindow chatWindow;
@@ -24,6 +29,9 @@ public class ChatBar extends WidgetGroup {
 
 	private TextField chatTextField;
 	private Image chatTextFieldLeft, chatTextFieldRight;
+
+	private final List<String> history = new ArrayList<>();
+	private int currentHistoryIndex;
 
 	public ChatBar(ChatWindow chatWindow, GameScreen game) {
 		this.chatWindow = chatWindow;
@@ -56,6 +64,24 @@ public class ChatBar extends WidgetGroup {
 					chatTextFieldLeft.setColor(1, 1, 1, 0.5f);
 					chatTextFieldRight.setColor(1, 1, 1, 0.5f);
 				}
+			}
+		});
+		chatTextField.addListener(new InputListener() {
+			@Override
+			public boolean keyDown(InputEvent event, int keycode) {
+				switch(keycode) {
+					case Input.Keys.DOWN:
+						currentHistoryIndex = Math.min(currentHistoryIndex + 1, history.size() - 1);
+						break;
+					case Input.Keys.UP:
+						currentHistoryIndex = Math.max(currentHistoryIndex - 1, 0);
+						break;
+					default: return false;
+				}
+
+				chatTextField.setText(history.get(currentHistoryIndex));
+				chatTextField.setCursorPosition(Integer.MAX_VALUE);
+				return true;
 			}
 		});
 
@@ -101,6 +127,9 @@ public class ChatBar extends WidgetGroup {
 			if(!message.isEmpty()) {
 				Main.client.sendEncodedPacket(new TalkReportPacket(message));
 				chatWindow.addMessage(game.getOwnCharacter().getName(), message, -1);
+
+				history.add(message);
+				currentHistoryIndex = history.size();
 			}
 
 			chatTextField.setText("");
