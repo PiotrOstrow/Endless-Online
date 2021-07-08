@@ -82,7 +82,7 @@ public class PlayerTextureAtlasFactory implements Disposable {
 	private final TextureRegion[] attackBow = new TextureRegion[4];
 
 	private PlayerTextureAtlasFactory() {
-		frameBuffer = new CustomFrameBuffer(Pixmap.Format.RGBA8888, atlasWidth, atlasHeight, true);
+		frameBuffer = new CustomFrameBuffer(Pixmap.Format.RGBA8888, atlasWidth, atlasHeight);
 		Texture texture = frameBuffer.getColorBufferTexture();
 		texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 

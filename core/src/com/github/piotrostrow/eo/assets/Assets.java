@@ -84,7 +84,7 @@ public class Assets {
 		TextureRegion textureRegion = new TextureRegion(texture);
 		textureRegion.flip(false, true);
 
-		CustomFrameBuffer customFrameBuffer = new CustomFrameBuffer(Pixmap.Format.RGBA8888, texture.getWidth(), texture.getHeight(), false);
+		CustomFrameBuffer customFrameBuffer = new CustomFrameBuffer(Pixmap.Format.RGBA8888, texture.getWidth(), texture.getHeight());
 		customFrameBuffer.bind();
 
 		Gdx.gl.glClearColor(0, 0, 0, 0);

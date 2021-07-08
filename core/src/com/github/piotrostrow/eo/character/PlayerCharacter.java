@@ -46,6 +46,11 @@ public class PlayerCharacter extends CharacterEntity {
 		return -24;
 	}
 
+	@Override
+	protected int getHPBarYOffset() {
+		return 85;
+	}
+
 	public int getPlayerID() {
 		return playerData.playerID;
 	}

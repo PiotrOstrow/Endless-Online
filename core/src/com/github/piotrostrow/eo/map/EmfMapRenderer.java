@@ -92,7 +92,16 @@ public class EmfMapRenderer implements Disposable {
 		renderLayer(map.ceilingLayer, 0, 64);
 		renderLayer(map.roofLayer, -132, 0);
 
+		renderHPBars();
+
 		batch.end();
+	}
+
+	private void renderHPBars() {
+		// TODO: render only if on screen
+		for(CharacterEntity character : characters) {
+			character.renderHPBar(batch);
+		}
 	}
 
 	private void renderItems() {

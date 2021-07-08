@@ -1,11 +1,13 @@
 package com.github.piotrostrow.eo.character;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
+import com.github.piotrostrow.eo.game.HPBar;
 
 public abstract class CharacterEntity implements Disposable, Comparable<CharacterEntity> {
 
@@ -46,19 +48,29 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 	 */
 	private long lastMoved;
 
+	private final HPBar hpBar = new HPBar();
+
 	CharacterEntity(int x, int y, int direction){
 		this.position.set(x, y);
 		this.renderingPosition.set(x, y);
 		this.direction = direction;
 	}
 
-	public abstract int getXOffset(int direction);
+	protected abstract int getXOffset(int direction);
 
-	public abstract int getYOffset(int direction);
+	protected abstract int getYOffset(int direction);
 
 	protected abstract TextureRegion getTextureRegion(CharacterState characterState, int direction, int frame);
 
 	public abstract String getName();
+
+	protected int getHPBarXOffset() {
+		return 0;
+	}
+
+	protected int getHPBarYOffset() {
+		return getTextureRegion(characterState, direction, 0).getRegionHeight() + 8;
+	}
 
 	// intended for refresh packets
 	protected void setPosition(int x, int y) {
@@ -168,10 +180,27 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 				break;
 		}
 
-		float xOffset = getXOffset(direction) + (32 - textureRegion.getRegionWidth() / 2f);
+		float xOffset = getXOffset(direction) + (32 - textureRegion.getRegionWidth() / 2);
 		float yOffset = getYOffset(direction);
 
 		batch.draw(textureRegion, x + xOffset + movePositionOffset.x, y + yOffset + movePositionOffset.y);
+	}
+
+	public void renderHPBar(Batch batch) {
+		if(hpBar.isVisible()) {
+			float x = (renderingPosition.x * 32) - (renderingPosition.y * 32);
+			float y = -((renderingPosition.y * 16) + (renderingPosition.x * 16));
+
+			float xOffset = getHPBarXOffset() + (64 - hpBar.getWidth()) / 2 + movePositionOffset.x;
+			float yOffset = getHPBarYOffset() + movePositionOffset.y;
+
+			hpBar.setPosition(Math.round(x + xOffset), Math.round(y + yOffset));
+			hpBar.draw(batch, 1.0f);
+		}
+	}
+
+	public void hit(int amount, float healthPercent) {
+		hpBar.show(healthPercent);
 	}
 
 	public CharacterState getCharacterState() {

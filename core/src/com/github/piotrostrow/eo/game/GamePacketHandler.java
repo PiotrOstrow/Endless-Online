@@ -31,6 +31,7 @@ public class GamePacketHandler implements ConnectionListener {
 		Main.client.registerPacketHandler(PacketFamily.PACKET_TALK, PacketAction.PACKET_PLAYER, this::handleTalkPlayerPacket);
 		Main.client.registerPacketHandler(PacketFamily.PACKET_ITEM, PacketAction.PACKET_ADD, this::handleItemAddPacket);
 		Main.client.registerPacketHandler(PacketFamily.PACKET_DOOR, PacketAction.PACKET_OPEN, this::handleDoorOpenPacket);
+		Main.client.registerPacketHandler(PacketFamily.PACKET_NPC, PacketAction.PACKET_REPLY, this::handleNpcReplyPacket);
 	}
 
 	@Override
@@ -44,6 +45,22 @@ public class GamePacketHandler implements ConnectionListener {
 			game.dispose();
 			Main.instance.setScreen(new MainMenuScreen());
 		});
+	}
+
+	/**
+	 * Sent when an NPC gets hit by attack or spell
+	 */
+	private void handleNpcReplyPacket(Packet packet) {
+		int playerID = packet.readEncodedShort();
+		int direction = packet.readEncodedByte();
+		int npcID = packet.readEncodedShort();
+		int amount = packet.readEncodedThreeByteInt();
+		int npcHealthPercent = packet.readEncodedShort();
+
+		CharacterEntity npc = game.getZone().getNPC(npcID);
+		if(npc != null)
+			npc.hit(amount, npcHealthPercent / 100.0f);
+
 	}
 
 	private void handleDoorOpenPacket(Packet packet) {
@@ -96,10 +113,16 @@ public class GamePacketHandler implements ConnectionListener {
 					direction = packet.readEncodedByte();
 					int targetPlayerID = packet.readEncodedShort();
 					int amount = packet.readEncodedThreeByteInt();
-					int targetHealthPrc = packet.readEncodedThreeByteInt();
+					int targetHealthPercent = packet.readEncodedThreeByteInt();
 
 					npc.setDirection(direction);
 					npc.attack();
+
+					PlayerCharacter target = game.getZone().getPlayer(targetPlayerID);
+
+					if(target != null)
+						target.hit(amount, targetHealthPercent / 100.0f);
+
 					break;
 			}
 		}

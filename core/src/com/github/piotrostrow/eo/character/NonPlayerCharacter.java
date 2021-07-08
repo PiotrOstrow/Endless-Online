@@ -23,27 +23,31 @@ public class NonPlayerCharacter extends CharacterEntity{
 	public void updateData(NpcData npcData) {
 		this.index = npcData.index;
 
+		if(this.enfData == null || this.enfData.npcID != npcData.id) { // in case NPCs can morph or something
+			initialize(npcData.id);
+		}
+
 		setPosition(npcData.x, npcData.y);
 		setDirection(npcData.direction);
+	}
 
-		if(this.enfData == null || this.enfData.npcID != npcData.id) { // in case NPCs can morph or something
-			this.enfData = Assets.getNpcData(npcData.id);
-			for(int i = 0; i < 4; i++) {
-				idle[i] = new TextureRegion(Assets.gfx(21, enfData.gfxID + i));
-				attack[i] = new TextureRegion(Assets.gfx(21, enfData.gfxID + i + 12));
-			}
-
-			for(int i = 0; i < 8; i++)
-				move[i] = new TextureRegion(Assets.gfx(21, enfData.gfxID + i + 4));
-
-			if(!enfData.hasIdleAnimation())
-				for(int i = 0; i < idle.length; i+= 2)
-					idle[i + 1] = idle[i];
-
-			setMirrorRegions(idle);
-			setMirrorRegions(move);
-			setMirrorRegions(attack);
+	private void initialize(int npcID) {
+		this.enfData = Assets.getNpcData(npcID);
+		for(int i = 0; i < 4; i++) {
+			idle[i] = new TextureRegion(Assets.gfx(21, enfData.gfxID + i));
+			attack[i] = new TextureRegion(Assets.gfx(21, enfData.gfxID + i + 12));
 		}
+
+		for(int i = 0; i < 8; i++)
+			move[i] = new TextureRegion(Assets.gfx(21, enfData.gfxID + i + 4));
+
+		if(!enfData.hasIdleAnimation())
+			for(int i = 0; i < idle.length; i+= 2)
+				idle[i + 1] = idle[i];
+
+		setMirrorRegions(idle);
+		setMirrorRegions(move);
+		setMirrorRegions(attack);
 	}
 
 	private void setMirrorRegions(TextureRegion[] regions) {

@@ -43,7 +43,7 @@ public class EnfFile {
 		public final int child;
 		public final int type;
 		public final int vendorID;
-		public final int hp;
+		public final int maxHP;
 		public final int minAP;
 		public final int maxAP;
 		public final int accuracy;
@@ -68,7 +68,7 @@ public class EnfFile {
 			child = stream.readUnsignedShort();
 			type = stream.readUnsignedShort();
 			vendorID = stream.readUnsignedShort();
-			hp = stream.threeByteInt();
+			maxHP = stream.threeByteInt();
 			unknowns[1] = stream.readUnsignedShort();
 			minAP = stream.readUnsignedShort();
 			maxAP = stream.readUnsignedShort();
@@ -95,16 +95,21 @@ public class EnfFile {
 
 			Pixmap pixmap = texture.getTextureData().consumePixmap();
 
-			ByteBuffer buffer = pixmap.getPixels();
-			while(buffer.hasRemaining()) {
-				if (buffer.get() != 0) {
-					hasIdleAnimation = true;
-					break;
+			// causes a crash sometimes because the pixmap is already disposed (?)
+			try {
+				ByteBuffer buffer = pixmap.getPixels();
+				while (buffer.hasRemaining()) {
+					if (buffer.get() != 0) {
+						hasIdleAnimation = true;
+						break;
+					}
 				}
-			}
 
-			pixmap.dispose();
-			initialized = true;
+				pixmap.dispose();
+				initialized = true;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		public boolean hasIdleAnimation() {
