@@ -190,4 +190,8 @@ public class Packet {
 	public boolean equals(byte packetFamily, byte packetAction) {
 		return packetFamily == getPacketFamilyByte() && packetAction == getPacketAction();
 	}
+
+	public int remaining() {
+		return buffer.remaining();
+	}
 }

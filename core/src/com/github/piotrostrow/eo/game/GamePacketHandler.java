@@ -32,6 +32,7 @@ public class GamePacketHandler implements ConnectionListener {
 		Main.client.registerPacketHandler(PacketFamily.PACKET_ITEM, PacketAction.PACKET_ADD, this::handleItemAddPacket);
 		Main.client.registerPacketHandler(PacketFamily.PACKET_DOOR, PacketAction.PACKET_OPEN, this::handleDoorOpenPacket);
 		Main.client.registerPacketHandler(PacketFamily.PACKET_NPC, PacketAction.PACKET_REPLY, this::handleNpcReplyPacket);
+		Main.client.registerPacketHandler(PacketFamily.PACKET_NPC, PacketAction.PACKET_SPEC, this::handleNpcSpecPacket);
 	}
 
 	@Override
@@ -48,9 +49,52 @@ public class GamePacketHandler implements ConnectionListener {
 	}
 
 	/**
+	 * Packet sent by server when an NPC is killed, or removed from view (?)
+	 */
+	private void handleNpcSpecPacket(Packet packet) {
+		// Packet of this size is sent when removing the NPC from view, but the NPCs disappear anyway and i don't
+		// remember why. Should also be of size 5, but the method returns size of the whole packet including headers,
+		// TODO: make new method for size without headers
+		if (packet.getSize() <= 7) {
+			System.out.println("NpcSpec packet with size of 5 or less not handled");
+		} else {
+			// TODO: has a spellID first if is hit by spell
+
+			int killerID = packet.readEncodedShort();
+			int killerDirection = packet.readEncodedByte();
+			int npcID = packet.readEncodedShort();
+			int groupID = packet.readEncodedShort();
+			int dropID = packet.readEncodedShort();
+			int x = packet.readEncodedByte();
+			int y = packet.readEncodedByte();
+			int dropAmount = packet.readEncodedInt();
+			int hitAmount = packet.readEncodedThreeByteInt();
+
+			if (packet.remaining() >= 4) {
+				int xp = packet.readEncodedInt();
+
+				if (packet.remaining() > 0) {
+					int level = packet.readEncodedShort();
+					int statPoints = packet.readEncodedShort();
+					int skillPoints = packet.readEncodedShort();
+					int maxHP = packet.readEncodedShort();
+					int maxTP = packet.readEncodedShort();
+					int maxSP = packet.readEncodedShort();
+				}
+			}
+
+			CharacterEntity npc = game.getZone().getNPC(npcID);
+			if (npc != null) {
+				npc.die(hitAmount);
+			}
+		}
+	}
+
+	/**
 	 * Sent when an NPC gets hit by attack or spell
 	 */
 	private void handleNpcReplyPacket(Packet packet) {
+		// has a spellID first if is hit by spell?
 		int playerID = packet.readEncodedShort();
 		int direction = packet.readEncodedByte();
 		int npcID = packet.readEncodedShort();
@@ -58,7 +102,7 @@ public class GamePacketHandler implements ConnectionListener {
 		int npcHealthPercent = packet.readEncodedShort();
 
 		CharacterEntity npc = game.getZone().getNPC(npcID);
-		if(npc != null)
+		if (npc != null)
 			npc.hit(amount, npcHealthPercent / 100.0f);
 
 	}
@@ -85,7 +129,7 @@ public class GamePacketHandler implements ConnectionListener {
 
 		CharacterEntity character = game.getZone().getPlayer(playerID);
 
-		if(character != null)
+		if (character != null)
 			game.getGameUI().getChatWindow().addMessage(character.getName(), message);
 		else
 			System.err.println("Cannot find player with ID " + playerID + " received in TalkPlayer packet");
@@ -120,7 +164,7 @@ public class GamePacketHandler implements ConnectionListener {
 
 					PlayerCharacter target = game.getZone().getPlayer(targetPlayerID);
 
-					if(target != null)
+					if (target != null)
 						target.hit(amount, targetHealthPercent / 100.0f);
 
 					break;
@@ -140,7 +184,7 @@ public class GamePacketHandler implements ConnectionListener {
 				// If updating own player, i suppose you should check whether or not the position is the same before
 				// and after. If not then stop the players character by locking the controller for a bit, otherwise weird
 				// things happen when spamming buttons, produces bugs most likely due to server not refreshing often enough
-				if(player == game.getOwnCharacter() && (player.getPosition().x != playerData.x || player.getPosition().y != playerData.y))
+				if (player == game.getOwnCharacter() && (player.getPosition().x != playerData.x || player.getPosition().y != playerData.y))
 					game.getCharacterController().lock(500);
 
 				player.updateData(playerData);
@@ -183,10 +227,12 @@ public class GamePacketHandler implements ConnectionListener {
 		packet.skip(2);
 		NpcData npcData = new NpcData(packet);
 		NonPlayerCharacter npc = game.getZone().getNPC(npcData.index);
-		if (npc != null)
+		if (npc != null) {
 			npc.updateData(npcData);
-		else
+			npc.setAlive();
+		} else {
 			game.getZone().addNpc(new NonPlayerCharacter(npcData));
+		}
 	}
 
 	private void handleAttackPlayerPacket(Packet packet) {

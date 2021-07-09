@@ -41,6 +41,8 @@ public class Client {
 
 	public void registerPacketHandler(byte packetFamily, byte packetAction, PacketHandler packetHandler) {
 		int hash = ((packetAction << 8) | packetFamily) & 0xFFFF;
+		if(packetHandlers.containsKey(hash))
+			throw new IllegalStateException("Packet handler for " + PacketFamily.getName(packetFamily) + ", " + PacketAction.getName(packetAction) + " is already registered");
 		packetHandlers.put(hash, packetHandler);
 	}
 

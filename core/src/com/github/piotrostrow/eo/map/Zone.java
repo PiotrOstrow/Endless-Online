@@ -122,7 +122,7 @@ public class Zone implements Disposable {
 			return true;
 
 		for(CharacterEntity character : characters)
-			if(character.getPosition().x == x && character.getPosition().y == y)
+			if(character.getPosition().x == x && character.getPosition().y == y && !character.isDead())
 				return true;
 
 		return false;

@@ -13,6 +13,11 @@ import com.github.piotrostrow.eo.game.HitLabel;
 public abstract class CharacterEntity implements Disposable, Comparable<CharacterEntity> {
 
 	/**
+	 * Amount of time before a character disappears completely after dying
+	 */
+	public static int DYING_DURATION = 1000;
+
+	/**
 	 * Duration of attack animation in milliseconds
 	 */
 	public static int ATTACK_SPEED = 600;
@@ -51,6 +56,9 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 
 	private final HPBar hpBar = new HPBar();
 	private final HitLabel hitLabel = new HitLabel();
+
+	private boolean isAlive = true;
+	private long diedAt;
 
 	CharacterEntity(int x, int y, int direction){
 		this.position.set(x, y);
@@ -161,6 +169,12 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 	}
 
 	public final void render(SpriteBatch batch, float x, float y){
+		if(isDead())
+			return;
+
+		if(isDying())
+			batch.setColor(1.0f, 1.0f, 1.0f, 0.5f);
+
 		TextureRegion textureRegion;
 		switch(characterState) {
 			case MOVE:
@@ -186,6 +200,9 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 		float yOffset = getYOffset(direction);
 
 		batch.draw(textureRegion, x + xOffset + movePositionOffset.x, y + yOffset + movePositionOffset.y);
+
+		if(isDying())
+			batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
 	public void renderUIElements(Batch batch) {
@@ -208,6 +225,25 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 	public void hit(int amount, float healthPercent) {
 		hpBar.show(healthPercent);
 		hitLabel.hit(amount);
+	}
+
+	public void die(int hitAmount) {
+		hpBar.show(0);
+		hitLabel.hit(hitAmount);
+		isAlive = false;
+		diedAt = System.currentTimeMillis();
+	}
+
+	public void setAlive() {
+		isAlive = true;
+	}
+
+	public boolean isDead() {
+		return !isAlive && diedAt + DYING_DURATION < System.currentTimeMillis();
+	}
+
+	public boolean isDying() {
+		return !isAlive;
 	}
 
 	public CharacterState getCharacterState() {
