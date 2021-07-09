@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.piotrostrow.eo.game.HPBar;
+import com.github.piotrostrow.eo.game.HitLabel;
 
 public abstract class CharacterEntity implements Disposable, Comparable<CharacterEntity> {
 
@@ -49,6 +50,7 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 	private long lastMoved;
 
 	private final HPBar hpBar = new HPBar();
+	private final HitLabel hitLabel = new HitLabel();
 
 	CharacterEntity(int x, int y, int direction){
 		this.position.set(x, y);
@@ -186,7 +188,7 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 		batch.draw(textureRegion, x + xOffset + movePositionOffset.x, y + yOffset + movePositionOffset.y);
 	}
 
-	public void renderHPBar(Batch batch) {
+	public void renderUIElements(Batch batch) {
 		if(hpBar.isVisible()) {
 			float x = (renderingPosition.x * 32) - (renderingPosition.y * 32);
 			float y = -((renderingPosition.y * 16) + (renderingPosition.x * 16));
@@ -194,13 +196,18 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 			float xOffset = getHPBarXOffset() + (64 - hpBar.getWidth()) / 2 + movePositionOffset.x;
 			float yOffset = getHPBarYOffset() + movePositionOffset.y;
 
-			hpBar.setPosition(Math.round(x + xOffset), Math.round(y + yOffset));
+			int renderX = Math.round(x + xOffset);
+			int renderY = Math.round(y + yOffset);
+			hpBar.setPosition(renderX, renderY);
 			hpBar.draw(batch, 1.0f);
+
+			hitLabel.render(batch, renderX, renderY);
 		}
 	}
 
 	public void hit(int amount, float healthPercent) {
 		hpBar.show(healthPercent);
+		hitLabel.hit(amount);
 	}
 
 	public CharacterState getCharacterState() {
