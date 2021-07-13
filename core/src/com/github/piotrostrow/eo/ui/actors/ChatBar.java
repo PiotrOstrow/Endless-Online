@@ -128,6 +128,8 @@ public class ChatBar extends WidgetGroup {
 				Main.client.sendEncodedPacket(new TalkReportPacket(message));
 				chatWindow.addMessage(game.getOwnCharacter().getName(), message, -1);
 
+				game.getOwnCharacter().getChatBubble().show(message);
+
 				history.add(message);
 				currentHistoryIndex = history.size();
 			}

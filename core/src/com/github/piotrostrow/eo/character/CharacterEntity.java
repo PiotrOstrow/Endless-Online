@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
+import com.github.piotrostrow.eo.game.ChatBubble;
 import com.github.piotrostrow.eo.game.HPBar;
 import com.github.piotrostrow.eo.game.HitLabel;
 
@@ -53,6 +54,8 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 	 * Timestamp to keep track of movement and have the character that moved last be on top when stacked with another
 	 */
 	private long lastMoved;
+
+	private final ChatBubble chatBubble = new ChatBubble();
 
 	private final HPBar hpBar = new HPBar();
 	private final HitLabel hitLabel = new HitLabel();
@@ -206,19 +209,26 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 	}
 
 	public void renderUIElements(Batch batch) {
-		if(hpBar.isVisible()) {
+		if(chatBubble.isVisible() || hpBar.isVisible()) {
 			float x = (renderingPosition.x * 32) - (renderingPosition.y * 32);
 			float y = -((renderingPosition.y * 16) + (renderingPosition.x * 16));
 
-			float xOffset = getHPBarXOffset() + (64 - hpBar.getWidth()) / 2 + movePositionOffset.x;
+			float xOffset = getHPBarXOffset() + movePositionOffset.x;
 			float yOffset = getHPBarYOffset() + movePositionOffset.y;
 
 			int renderX = Math.round(x + xOffset);
 			int renderY = Math.round(y + yOffset);
-			hpBar.setPosition(renderX, renderY);
-			hpBar.draw(batch, 1.0f);
 
-			hitLabel.render(batch, renderX, renderY);
+			if(hpBar.isVisible()) {
+				int addXOffset = (int)(64 - hpBar.getWidth()) / 2;
+
+				hpBar.setPosition(renderX + addXOffset, renderY);
+				hpBar.draw(batch, 1.0f);
+
+				hitLabel.render(batch, renderX + addXOffset, renderY);
+			} else {
+				chatBubble.render(batch, renderX, renderY);
+			}
 		}
 	}
 
@@ -244,6 +254,10 @@ public abstract class CharacterEntity implements Disposable, Comparable<Characte
 
 	public boolean isDying() {
 		return !isAlive;
+	}
+
+	public ChatBubble getChatBubble() {
+		return chatBubble;
 	}
 
 	public CharacterState getCharacterState() {

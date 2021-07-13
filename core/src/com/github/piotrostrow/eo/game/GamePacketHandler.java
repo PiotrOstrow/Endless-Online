@@ -129,10 +129,12 @@ public class GamePacketHandler implements ConnectionListener {
 
 		CharacterEntity character = game.getZone().getPlayer(playerID);
 
-		if (character != null)
+		if (character != null) {
 			game.getGameUI().getChatWindow().addMessage(character.getName(), message);
-		else
+			character.getChatBubble().show(message);
+		} else {
 			System.err.println("Cannot find player with ID " + playerID + " received in TalkPlayer packet");
+		}
 	}
 
 	private void handleNpcPlayerPacket(Packet packet) {
